@@ -1,36 +1,51 @@
 <?php
+
 namespace Progredi\Blog\Controller\Admin;
 
-use App\Controller\AppController as BaseController;
+use App\Controller\Admin\AppController as BaseController;
 use Cake\Event\Event;
 use Cake\Network\Exception\NotFoundException;
 use Cake\Network\Session;
+use Cake\ORM\TableRegistry;
 
 /**
  * Blog AppController
  *
- * PHP5
+ * PHP5/7
  *
- * @category Controller
- * @package  CakePHP Blog Plugin
- * @version  0.1.0
- * @author   David Scott <support@progredi.co.uk>
- * @license  http://www.opensource.org/licenses/mit-license.php The MIT License
- * @link     http://www.progredi.co.uk/cakephp/plugins/cakephp-blog-plugin
+ * @category  Controller
+ * @package   Progredi\Blog
+ * @version   0.1.0
+ * @author    David Scott <support@progredi.co.uk>
+ * @copyright Copyright (c) 2014-2017 Progredi
+ * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @link      http://www.progredi.co.uk/cakephp/plugins/blog
  */
 class AppController extends BaseController
 {
 	/**
-	 * Helpers
+	 * Pagination Configuration
 	 *
 	 * @var array
 	 * @access public
 	 */
-	public $helpers = [
-		'Html' => ['templates' => 'templates'],
-		'Paginator' => ['templates' => 'templates/paginator'],
-		'Form' => ['templates' => 'templates/form']
+	public $paginate = [
+		'limit' => 10
 	];
+
+	/**
+	 * Initialize()
+	 *
+	 * @access public
+	 * @return void
+	 */
+	public function initialize()
+	{
+		parent::initialize();
+		$this->loadComponent('Flash');
+		$this->loadComponent('Paginator');
+		//$this->loadComponent('Markdown.Markdown');
+	}
 
 	/**
 	 * BeforeFilter method [Admin]
@@ -46,23 +61,12 @@ class AppController extends BaseController
 		}
 	}
 
-	/**
-	 * initialize()
-	 *
-	 * @access public
-	 * @return void
-	 */
-	public function initialize()
-	{
-		parent::initialize();
-		$this->loadComponent('Flash');
-		$this->loadComponent('Paginator');
-	}
-
 	// SHARED FUNCTIONS
 
 	/**
 	 * Index method [Admin]
+	 * 
+	 * Provides text search functionality.
 	 *
 	 * @access public
 	 * @return array
@@ -72,10 +76,11 @@ class AppController extends BaseController
 		$conditions = [];
 		$model = $this->name;
 
-		if ($this->request->is(['post', 'put'])) {
-			$column = $this->request->data['column'];
-			$value = $this->request->data['value'];
-			$conditions = $column == 'id' ? ["$model.$column" => [$value]]
+		if ($this->request->is(['get']) && isset($this->request->query['column'])) {
+			$column = $this->request->query['column'];
+			$value = $this->request->query['value'];
+			$conditions = $column == 'id'
+				? ["$model.id" => [$value]]
 				:  ["$model.$column LIKE" => "%$value%"];
 		}
 

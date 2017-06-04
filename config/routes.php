@@ -1,75 +1,111 @@
 <?php
 
+use Cake\Routing\RouteBuilder;
 use Cake\Routing\Router;
+use Cake\Routing\Route\DashedRoute;
 
 /**
- * Routes
+ * Blog Routes
  *
- * PHP5
+ * PHP5/7
  *
- * @category Config
- * @package  CakePHP Blog Plugin
- * @version  0.1.0
- * @author   David Scott <dscott@progredi.co.uk>
- * @license  http://www.opensource.org/licenses/mit-license.php The MIT License
- * @link     http://www.progredi.co.uk/cakephp/plugins/cakephp-blog-plugin
+ * @category  Config
+ * @package   Progredi\Blog
+ * @version   0.1.0
+ * @author    David Scott <support@progredi.co.uk>
+ * @copyright Copyright (c) 2014-2017 Progredi
+ * @license   https://choosealicense.com/licenses/mit/ MIT License
+ * @link      https://github.com/progredi/blog
  */
 
-Router::defaultRouteClass('DashedRoute');
+Router::defaultRouteClass(DashedRoute::class);
 
-Router::scope('/', function ($routes) {
+Router::scope('/', function (RouteBuilder $routes) {
 
-	$routes->connect('/blog',
-		['plugin' => 'Progredi/Blog', 'controller' => 'Articles', 'action' => 'index']
-	);
+    $routes->extensions(['rss']);
+
+    $routes->connect('/blog',
+        ['plugin' => 'Progredi/Blog', 'controller' => 'Posts', 'action' => 'index']
+    );
 });
 
-Router::plugin('Progredi/Blog', function ($routes) {
+Router::plugin('Progredi/Blog', ['path' => '/blog'], function (RouteBuilder $routes) {
 
-	$routes->connect('/:controller',
-		['action' => 'index']
-	);
-	$routes->connect('/:controller/:action',
-		[]
-	);
-	$routes->connect('/:controller/:action/:id',
-		[], ['id' => '[0-9]+', 'pass' => ['id']]
-	);
-	$routes->connect(
-		'/:controller/:year/:month/:day/:slug',
-		['action' => 'view'],
-		[
-			'year' => '[12][0-9]{3}',
-			'month' => '0[1-9]|1[012]',
-			'day' => '0[1-9]|[12][0-9]|3[01]'
-		]
-	);
+    $routes->connect(
+        '/category/:category',
+        ['controller' => 'Categories', 'action' => 'view'],
+        ['category' => '[a-zA-Z0-9\-\_]+', 'pass' => ['category']]
+    );
+
+/*
+    $routes->connect(
+        '/:controller/:day/:month/:year/:slug',
+        ['action' => 'view'],
+        [
+            'day' => '0[1-9]|[12][0-9]|3[01]',
+            'month' => '0[1-9]|1[012]',
+            'year' => '[12][0-9]{3}'
+        ]
+    );
+    $routes->connect(
+        '/post/:id',///:slug
+        ['controller' => 'Posts', 'action' => 'view'],
+        [
+            'id' => '[0-9]+',
+            //'slug' => '[a-zA-Z0-9-]+',
+            'pass' => ['id']//, 'slug'
+        ]
+    );
+    $routes->connect(
+        '/posts/:id',
+        ['controller' => 'Posts', 'action' => 'view'],
+        ['id' => '[0-9]+', 'pass' => ['id']]
+    );
+*/
+
+    $routes->connect(
+        '/posts/:id',
+        ['controller' => 'Posts', 'action' => 'view'],
+        ['id' => '[0-9]+', 'pass' => ['id']]
+    );
+
+    $routes->connect('/:controller',
+        ['action' => 'index']
+    );
+    $routes->connect('/:controller/:action',
+        []
+    );
+    $routes->connect('/:controller/:action/:id',
+        [], ['id' => '[0-9]+', 'pass' => ['id']]
+    );
 });
 
-Router::prefix('admin', function ($routes) {
+Router::prefix('admin', function (RouteBuilder $routes) {
 
-	$routes->redirect('/blog',
-		['plugin' => 'Progredi/Blog', 'controller' => 'Blog', 'action' => 'dashboard'],
-		['status' => 301]
-	);
+    $routes->redirect('/blog',
+        ['plugin' => 'Progredi/Blog', 'controller' => 'Blog', 'action' => 'dashboard'],
+        ['status' => 301]
+    );
 
-	$routes->plugin('Blog', function ($routes) {
+    $routes->connect('/blog/preferences',
+        ['plugin' => null, 'controller' => 'Preferences', 'action' => 'index', 'blog']
+    );
 
-		$routes->connect('/dashboard',
-			['controller' => 'Blog', 'action' => 'dashboard']
-		);
+    $routes->plugin('Progredi/Blog', ['path' => '/blog'], function ($routes) {
 
-		$routes->connect('/:controller',
-			['action' => 'index']
-		);
-		$routes->connect('/:controller/:action',
-			[]
-		);
-		$routes->connect('/:controller/:action/:id',
-			[],
-			['pass' => ['id'], 'id' => '[0-9]+']
-		);
-	});
+        $routes->connect('/dashboard',
+            ['controller' => 'Blog', 'action' => 'dashboard']
+        );
+
+        $routes->connect('/:controller',
+            ['action' => 'index']
+        );
+        $routes->connect('/:controller/:action',
+            []
+        );
+        $routes->connect('/:controller/:action/:id',
+            [],
+            ['pass' => ['id'], 'id' => '[0-9]+']
+        );
+    });
 });
-
-//Router::connect('/blog/archives/*',   array('plugin' => 'blogs', 'controller' => 'blogs', 'action' => 'index'));

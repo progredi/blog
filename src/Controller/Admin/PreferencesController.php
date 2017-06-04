@@ -1,22 +1,28 @@
 <?php
+
 namespace Progredi\Blog\Controller\Admin;
 
 use Progredi\Blog\Controller\Admin\AppController;
 
+use Cake\Datasource\Exception\InvalidPrimaryKeyException;
+use Cake\Datasource\Exception\RecordNotFoundException;
+use Cake\Network\Exception\NotFoundException;
+use Cake\Network\Session;
+
 /**
- * Comments Controller
+ * Preferences Admin Controller
  *
- * PHP5
+ * PHP5/7
  *
  * @category  Controller\Admin
- * @package   Progredi\Blog
+ * @package   Progredi\App
  * @version   0.1.0
  * @author    David Scott <support@progredi.co.uk>
  * @copyright Copyright (c) 2014-2017 Progredi
- * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- * @link      http://www.progredi.co.uk/cakephp/plugins/blog
+ * @license   https://choosealicense.com/licenses/mit/ MIT License
+ * @link      https://github.com/progredi/blog
  */
-class CommentsController extends AppController
+class PreferencesController extends AppController
 {
 	/**
 	 * Index method [Admin]
@@ -27,20 +33,17 @@ class CommentsController extends AppController
 	{
 		// Configure pagination request.
 
-		$this->paginate['Comments'] = [
-			'conditions' => parent::admin_index(),
-			//'fields' => ['Comments.id', 'Comments.name', 'Comments.enabled'],
+		$this->paginate['Preferences'] = [
+			'conditions' => parent::index(),
+			//'fields' => ['Preferences.id', 'Preferences.name', 'Preferences.enabled'],
 			'limit' => $this->paginate['limit'],
-			'order' => ['Comments.name' => 'asc'],
-			'contain' => [
-				'Posts'
-			]
+			'order' => ['Preferences.name' => 'asc']
 		];
 
 		// Check for invalid pagination requests.
 
 		try {
-			$comments = $this->paginate($this->Comments);
+			$preferences = $this->paginate($this->Preferences);
 		}
 		catch (NotFoundException $e) {
 
@@ -50,10 +53,10 @@ class CommentsController extends AppController
 			return $this->redirect(['action' => 'index']);
 		}
 
-		$this->set('title_for_layout', __('Comments') . TS . __('Blog') . TS . __('Admin'));
+		$this->set('title_for_layout', __('Preferences') . TS . __('Blog') . TS . __('Admin'));
 
-		$this->set('comments', $comments);
-		$this->set('_serialize', ['comments']);
+		$this->set('preferences', $preferences);
+		$this->set('_serialize', ['preferences']);
 	}
 
 	/**
@@ -65,38 +68,41 @@ class CommentsController extends AppController
 	{
 		$session = $this->request->session();
 
-		$comment = $this->Comments->newEntity();
+		$entityName = $this->Preferences->newEntity();
 
 		if ($this->request->is('post')) {
-			$comment = $this->Comments->patchEntity($comment, $this->request->data);
+			$entityName = $this->Preferences->patchEntity($entityName, $this->request->data);
 			// Validate request data for new entity
-			if ($comment->errors()) {
+			if ($entityName->errors()) {
 				// Entity failed validation.
 			}
-			if ($this->Comments->save($comment)) {
-				$this->Flash->success(__('Comment details have been saved'));
+			if ($this->Preferences->save($entityName)) {
+				$this->Flash->success(__('Entity name details have been saved'));
 				if (isset($this->request->data['apply'])) {
-					return $this->redirect(['action' => 'edit', $this->Comments->id]);
+					return $this->redirect(['action' => 'edit', $this->Preferences->id]);
 				}
 				return $this->redirect($session->read('App.referrer'));
 			}
-			$this->Flash->error(__('Comment details could not be saved, please try again'));
+			$this->Flash->error(__('Entity name details could not be saved, please try again'));
 		}
 
 		if (!$this->request->data) {
 			$session->write('App.referrer', $this->referer());
 		}
 
-		$this->set('title_for_layout', __('Add Comment') . TS . __('Blog') . TS . __('Admin'));
+		$this->set('title_for_layout', __('Add Entity Name') . TS . __('Plugin Name') . TS . __('Admin'));
 
-		$this->set('comment', $comment);
-		$this->set('_serialize', ['comment']);
+		$this->set('entityName', $entityName);
+		$this->set('_serialize', ['entityName']);
+
+		// Optional dropdown list data
+		//$this->set('assocTableNameList', $this->TableName->AssocTableName->options());
 	}
 
 	/**
 	 * View method [Admin]
 	 *
-	 * @param string|null $id comment id. Can be null for testing purposes.
+	 * @param string|null $id EntityName id. Can be null for testing purposes.
 	 * @return void Redirects on failed entity retrieval, renders view otherwise.
 	 */
 	public function view($id = null)
@@ -104,16 +110,15 @@ class CommentsController extends AppController
 		// Check for entity request errors.
 
 		try {
-			$comment = $this->Comments->get($id//, [
-				//'contain' => ['Posts']
-			//]
-			);
+			$entityName = $this->Preferences->get($id, [
+				'contain' => ['AssocPreferences']
+			]);
 		}
 		catch (RecordNotFoundException $e) {
 
 			// Record primary key not found in table.
 
-			$this->Flash->error(__('Comment not found'));
+			$this->Flash->error(__('Entity Name not found'));
 			return $this->redirect(['action' => 'index']);
 		}
 		catch (InvalidPrimaryKeyException $e) {
@@ -124,19 +129,19 @@ class CommentsController extends AppController
 			return $this->redirect(['action' => 'index']);
 		}
 
-		$this->set('title_for_layout', __('View Comment') . TS . __('Blog') . TS . __('Admin'));
+		$this->set('title_for_layout', __('View Entity Name') . TS . __('Plugin Name') . TS . __('Admin'));
 
 		$session = $this->request->session();
 		$session->write('App.referrer', $this->referer());
 
-		$this->set('comment', $comment);
-		$this->set('_serialize', ['comment']);
+		$this->set('entityName', $entityName);
+		$this->set('_serialize', ['entityName']);
 	}
 
 	/**
 	 * Edit method [Admin]
 	 *
-	 * @param string|null $id Comment id.
+	 * @param string|null $id Entity name id.
 	 * @return void Redirects to referring page on successful edit, renders view otherwise.
 	 * @throws \Cake\Network\Exception\NotFoundException When record not found.
 	 */
@@ -145,15 +150,15 @@ class CommentsController extends AppController
 		// Check for entity request errors.
 
 		try {
-			$comment = $this->Comments->get($id, [
-				'contain' => ['AssocComments']
+			$entityName = $this->Preferences->get($id, [
+				'contain' => ['AssocPreferences']
 			]);
 		}
 		catch (RecordNotFoundException $e) {
 
 			// Record primary key not found in table.
 
-			$this->Flash->error(__('Comment not found'));
+			$this->Flash->error(__('Entity Name not found'));
 			return $this->redirect(['action' => 'index']);
 		}
 		catch (InvalidPrimaryKeyException $e) {
@@ -167,30 +172,30 @@ class CommentsController extends AppController
 		$session = $this->request->session();
 
 		if ($this->request->is(['patch', 'post', 'put'])) {
-			$comment = $this->Comments->patchEntity($comment, $this->request->data);
+			$entityName = $this->Preferences->patchEntity($entityName, $this->request->data);
 			// Validate request data for new entity
-			if ($comment->errors()) {
+			if ($entityName->errors()) {
 				// Entity failed validation.
 			}
-			if ($this->Comments->save($comment)) {
-				$this->Flash->success(__('Comment details haves been updated'));
+			if ($this->Preferences->save($entityName)) {
+				$this->Flash->success(__('Entity name details haves been updated'));
 				if (!isset($this->request->data['apply'])) {
 					return $this->redirect($session->read('App.referrer'));
 				}
 			} else {
-				$this->Flash->error(__('Comment details could not be updated, please try again'));
+				$this->Flash->error(__('Entity name details could not be updated, please try again'));
 			}
 		}
 
 		if (!$this->request->data) {
-			$this->request->data = $comment;
+			$this->request->data = $entityName;
 			$session->write('App.referrer', $this->referer());
 		}
 
-		$this->set('title_for_layout', __('Edit Comment') . TS . __('Blog') . TS . __('Admin'));
+		$this->set('title_for_layout', __('Edit Entity Name') . TS . __('Plugin Name') . TS . __('Admin'));
 
-		$this->set('comment', $comment);
-		$this->set('_serialize', ['comment']);
+		$this->set('entityName', $entityName);
+		$this->set('_serialize', ['entityName']);
 
 		// Optional dropdown list data
 		//$this->set('assocTableNameList', $this->TableName->AssocTableName->options());
@@ -199,7 +204,7 @@ class CommentsController extends AppController
 	/**
 	 * Delete method [Admin]
 	 *
-	 * @param string|null $id comment id.
+	 * @param string|null $id EntityName id.
 	 * @return void Redirects to referrer or index method
 	 */
 	public function delete($id = null)
@@ -209,13 +214,13 @@ class CommentsController extends AppController
 		// Check for entity request errors.
 
 		try {
-			$comment = $this->Comments->get($id);
+			$entityName = $this->Preferences->get($id);
 		}
 		catch (RecordNotFoundException $e) {
 
 			// Record primary key not found in table.
 
-			$this->Flash->error(__('Comment not found'));
+			$this->Flash->error(__('Entity Name not found'));
 			return $this->redirect(env('HTTP_REFERER'));
 		}
 		catch (InvalidPrimaryKeyException $e) {
@@ -226,10 +231,10 @@ class CommentsController extends AppController
 			return $this->redirect(env('HTTP_REFERER'));
 		}
 
-		if ($this->Comments->delete($comment)) {
-			$this->Flash->success(__('Comment has been deleted'));
+		if ($this->Preferences->delete($entityName)) {
+			$this->Flash->success(__('Entity name has been deleted'));
 		} else {
-			$this->Flash->error(__('Comment could not be deleted, please try again'));
+			$this->Flash->error(__('Entity name could not be deleted, please try again'));
 		}
 
 		return $this->redirect(preg_match('/view|edit/', env('HTTP_REFERER'))

@@ -1,45 +1,65 @@
 <?php
 
-namespace Blog\Model\Table;
+namespace Progredi\Blog\Model\Table;
 
-use Blog\Model\Table\AppTable;
+use Cake\Cache\Cache;
+use Cake\ORM\Query;
+use Cake\ORM\RulesChecker;
 use Cake\Validation\Validator;
+use Progredi\Blog\Model\Table\AppTable;
 
 /**
- * Articles Table
+ * Posts Table
  *
- * PHP5
+ * PHP5/7
  *
  * @category  Model\Table
- * @package   CakePHP Blog Plugin
+ * @package   Progredi\Blog
  * @version   0.1.0
  * @author    David Scott <support@progredi.co.uk>
- * @copyright Copyright (c) Progredi
+ * @copyright Copyright (c) 2014-2017 Progredi
  * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- * @link      http://www.progredi.co.uk/cakephp/plugins/cakephp-blog-plugin
+ * @link      http://www.progredi.co.uk/cakephp/plugins/blog
  */
-class ArticlesTable extends AppTable
+class PostsTable extends AppTable
 {
 	/**
 	 * Initialize method
 	 *
-	 * @param array $config
-	 * @access public
+	 * @param array $config Configuration for the Table.
+	 * @return void
 	 */
 	public function initialize(array $config)
 	{
 		parent::initialize($config);
 
-		$this->table('blog_articles');
+		$this->table('blog_posts');
+		
+		// Behaviors
+
+		$this->addBehavior('CounterCache', [
+			'Posts' => ['comment_count']
+		]);
 
 		// Associations
 
 		$this->hasMany('Comments', [
-			'className' => 'Blog.Comments',
-			'foreignKey' => 'article_id',
-			'sort' => 'created DESC',
+			'className' => 'Progredi/Blog.Comments',
+			'foreignKey' => 'post_id',
+			'sort' => 'created desc',
 			'dependent' => true
 		]);
+		$this->belongsToMany('Categories', [
+			'className' => 'Progredi/Blog.Categories',
+			'joinTable' => 'blog_categories_posts',
+			'foreignKey' => 'post_id'
+		]);
+		$this->belongsToMany('Tags', [
+			'className' => 'Progredi/Blog.Tags',
+			'joinTable' => 'blog_posts_tags',
+			'foreignKey' => 'post_id'
+		]);
+		
 	}
 
 	/**

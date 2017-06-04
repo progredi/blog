@@ -9,7 +9,7 @@ use Cake\Validation\Validator;
 use Progredi\Blog\Model\Table\AppTable;
 
 /**
- * Comments Table
+ * Tags Table
  *
  * PHP5/7
  *
@@ -21,26 +21,32 @@ use Progredi\Blog\Model\Table\AppTable;
  * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  * @link      http://www.progredi.co.uk/cakephp/plugins/blog
  */
-class CommentsTable extends AppTable
+class TagsTable extends AppTable
 {
 	/**
 	 * Initialize method
 	 *
-	 * @param array $config
-	 * @access public
+	 * @param array $config Configuration for the Table.
+	 * @return void
 	 */
 	public function initialize(array $config)
 	{
 		parent::initialize($config);
 
-		$this->table('blog_comments');
-		//$this->addBehavior('Tree');
+		$this->table('blog_tags');
+		
+		// Behaviors
+
+		$this->addBehavior('CounterCache', [
+			'Tags' => ['post_count']
+		]);
 
 		// Associations
 
-		$this->belongsTo('Posts', [
-			'className' => 'Progredi\Blog.Posts',
-			'foreignKey' => 'post_id'
+		$this->belongsToMany('Posts', [
+			'className' => 'Progredi/Blog.Posts',
+			'joinTable' => 'blog_posts_tags',
+			'foreignKey' => 'tag_id'
 		]);
 	}
 }

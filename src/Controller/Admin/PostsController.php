@@ -1,14 +1,20 @@
 <?php
+
 namespace Progredi\Blog\Controller\Admin;
 
 use Progredi\Blog\Controller\Admin\AppController;
 
+use Cake\Datasource\Exception\InvalidPrimaryKeyException;
+use Cake\Datasource\Exception\RecordNotFoundException;
+use Cake\Network\Exception\NotFoundException;
+use Cake\Network\Session;
+
 /**
- * Comments Controller
+ * Posts Admin Controller
  *
- * PHP5
+ * PHP5/7
  *
- * @category  Controller\Admin
+ * @category  Controller
  * @package   Progredi\Blog
  * @version   0.1.0
  * @author    David Scott <support@progredi.co.uk>
@@ -16,7 +22,7 @@ use Progredi\Blog\Controller\Admin\AppController;
  * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  * @link      http://www.progredi.co.uk/cakephp/plugins/blog
  */
-class CommentsController extends AppController
+class PostsController extends AppController
 {
 	/**
 	 * Index method [Admin]
@@ -25,22 +31,29 @@ class CommentsController extends AppController
 	 */
 	public function index()
 	{
+		//$posts = $this->Posts->find('all')->contain(['Tags']);
+
+//echo "<pre>\n\nRequest Data: " . print_r($posts->toArray(), true) . "\n</pre>\n\n";
+//exit();
+
 		// Configure pagination request.
 
-		$this->paginate['Comments'] = [
-			'conditions' => parent::admin_index(),
-			//'fields' => ['Comments.id', 'Comments.name', 'Comments.enabled'],
+		$this->paginate['Posts'] = [
+			'conditions' => parent::index(),
+			//'fields' => ['Posts.title', 'Posts.comment_count', 'Posts.published', 'Posts.enabled'],
 			'limit' => $this->paginate['limit'],
-			'order' => ['Comments.name' => 'asc'],
+			'order' => ['Posts.published' => 'desc'],
 			'contain' => [
-				'Posts'
+				'Comments',
+				'Categories',
+				'Tags'
 			]
 		];
 
 		// Check for invalid pagination requests.
 
 		try {
-			$comments = $this->paginate($this->Comments);
+			$posts = $this->paginate($this->Posts);
 		}
 		catch (NotFoundException $e) {
 
@@ -50,10 +63,10 @@ class CommentsController extends AppController
 			return $this->redirect(['action' => 'index']);
 		}
 
-		$this->set('title_for_layout', __('Comments') . TS . __('Blog') . TS . __('Admin'));
+		$this->set('title_for_layout', __('Posts') . TS . __('Blog') . TS . __('Admin'));
 
-		$this->set('comments', $comments);
-		$this->set('_serialize', ['comments']);
+		$this->set('posts', $posts);
+		$this->set('_serialize', ['posts']);
 	}
 
 	/**
@@ -65,38 +78,38 @@ class CommentsController extends AppController
 	{
 		$session = $this->request->session();
 
-		$comment = $this->Comments->newEntity();
+		$post = $this->Posts->newEntity();
 
 		if ($this->request->is('post')) {
-			$comment = $this->Comments->patchEntity($comment, $this->request->data);
+			$post = $this->Posts->patchEntity($post, $this->request->data);
 			// Validate request data for new entity
-			if ($comment->errors()) {
+			if ($post->errors()) {
 				// Entity failed validation.
 			}
-			if ($this->Comments->save($comment)) {
-				$this->Flash->success(__('Comment details have been saved'));
+			if ($this->Posts->save($post)) {
+				$this->Flash->success(__('Post details have been saved'));
 				if (isset($this->request->data['apply'])) {
-					return $this->redirect(['action' => 'edit', $this->Comments->id]);
+					return $this->redirect(['action' => 'edit', $this->Posts->id]);
 				}
 				return $this->redirect($session->read('App.referrer'));
 			}
-			$this->Flash->error(__('Comment details could not be saved, please try again'));
+			$this->Flash->error(__('Post details could not be saved, please try again'));
 		}
 
 		if (!$this->request->data) {
 			$session->write('App.referrer', $this->referer());
 		}
 
-		$this->set('title_for_layout', __('Add Comment') . TS . __('Blog') . TS . __('Admin'));
+		$this->set('title_for_layout', __('Add Post') . TS . __('Blog') . TS . __('Admin'));
 
-		$this->set('comment', $comment);
-		$this->set('_serialize', ['comment']);
+		$this->set('post', $post);
+		$this->set('_serialize', ['post']);
 	}
 
 	/**
 	 * View method [Admin]
 	 *
-	 * @param string|null $id comment id. Can be null for testing purposes.
+	 * @param string|null $id post id. Can be null for testing purposes.
 	 * @return void Redirects on failed entity retrieval, renders view otherwise.
 	 */
 	public function view($id = null)
@@ -104,16 +117,19 @@ class CommentsController extends AppController
 		// Check for entity request errors.
 
 		try {
-			$comment = $this->Comments->get($id//, [
-				//'contain' => ['Posts']
-			//]
-			);
+			$post = $this->Posts->get($id, [
+				'contain' => [
+					'Comments',
+					'Categories',
+					'Tags'
+				]
+			]);
 		}
 		catch (RecordNotFoundException $e) {
 
 			// Record primary key not found in table.
 
-			$this->Flash->error(__('Comment not found'));
+			$this->Flash->error(__('Post not found'));
 			return $this->redirect(['action' => 'index']);
 		}
 		catch (InvalidPrimaryKeyException $e) {
@@ -124,19 +140,19 @@ class CommentsController extends AppController
 			return $this->redirect(['action' => 'index']);
 		}
 
-		$this->set('title_for_layout', __('View Comment') . TS . __('Blog') . TS . __('Admin'));
+		$this->set('title_for_layout', __('View Post') . TS . __('Blog') . TS . __('Admin'));
 
 		$session = $this->request->session();
 		$session->write('App.referrer', $this->referer());
 
-		$this->set('comment', $comment);
-		$this->set('_serialize', ['comment']);
+		$this->set('post', $post);
+		$this->set('_serialize', ['post']);
 	}
 
 	/**
 	 * Edit method [Admin]
 	 *
-	 * @param string|null $id Comment id.
+	 * @param string|null $id Post id.
 	 * @return void Redirects to referring page on successful edit, renders view otherwise.
 	 * @throws \Cake\Network\Exception\NotFoundException When record not found.
 	 */
@@ -145,15 +161,15 @@ class CommentsController extends AppController
 		// Check for entity request errors.
 
 		try {
-			$comment = $this->Comments->get($id, [
-				'contain' => ['AssocComments']
+			$post = $this->Posts->get($id, [
+				'contain' => ['Comments']
 			]);
 		}
 		catch (RecordNotFoundException $e) {
 
 			// Record primary key not found in table.
 
-			$this->Flash->error(__('Comment not found'));
+			$this->Flash->error(__('Post not found'));
 			return $this->redirect(['action' => 'index']);
 		}
 		catch (InvalidPrimaryKeyException $e) {
@@ -167,39 +183,36 @@ class CommentsController extends AppController
 		$session = $this->request->session();
 
 		if ($this->request->is(['patch', 'post', 'put'])) {
-			$comment = $this->Comments->patchEntity($comment, $this->request->data);
+			$post = $this->Posts->patchEntity($post, $this->request->data);
 			// Validate request data for new entity
-			if ($comment->errors()) {
+			if ($post->errors()) {
 				// Entity failed validation.
 			}
-			if ($this->Comments->save($comment)) {
-				$this->Flash->success(__('Comment details haves been updated'));
+			if ($this->Posts->save($post)) {
+				$this->Flash->success(__('Post details haves been updated'));
 				if (!isset($this->request->data['apply'])) {
 					return $this->redirect($session->read('App.referrer'));
 				}
 			} else {
-				$this->Flash->error(__('Comment details could not be updated, please try again'));
+				$this->Flash->error(__('Post details could not be updated, please try again'));
 			}
 		}
 
 		if (!$this->request->data) {
-			$this->request->data = $comment;
+			$this->request->data = $post;
 			$session->write('App.referrer', $this->referer());
 		}
 
-		$this->set('title_for_layout', __('Edit Comment') . TS . __('Blog') . TS . __('Admin'));
+		$this->set('title_for_layout', __('Edit Post') . TS . __('Blog') . TS . __('Admin'));
 
-		$this->set('comment', $comment);
-		$this->set('_serialize', ['comment']);
-
-		// Optional dropdown list data
-		//$this->set('assocTableNameList', $this->TableName->AssocTableName->options());
+		$this->set('post', $post);
+		$this->set('_serialize', ['post']);
 	}
 
 	/**
 	 * Delete method [Admin]
 	 *
-	 * @param string|null $id comment id.
+	 * @param string|null $id post id.
 	 * @return void Redirects to referrer or index method
 	 */
 	public function delete($id = null)
@@ -209,13 +222,13 @@ class CommentsController extends AppController
 		// Check for entity request errors.
 
 		try {
-			$comment = $this->Comments->get($id);
+			$post = $this->Posts->get($id);
 		}
 		catch (RecordNotFoundException $e) {
 
 			// Record primary key not found in table.
 
-			$this->Flash->error(__('Comment not found'));
+			$this->Flash->error(__('Post not found'));
 			return $this->redirect(env('HTTP_REFERER'));
 		}
 		catch (InvalidPrimaryKeyException $e) {
@@ -226,10 +239,10 @@ class CommentsController extends AppController
 			return $this->redirect(env('HTTP_REFERER'));
 		}
 
-		if ($this->Comments->delete($comment)) {
-			$this->Flash->success(__('Comment has been deleted'));
+		if ($this->Posts->delete($post)) {
+			$this->Flash->success(__('Post has been deleted'));
 		} else {
-			$this->Flash->error(__('Comment could not be deleted, please try again'));
+			$this->Flash->error(__('Post could not be deleted, please try again'));
 		}
 
 		return $this->redirect(preg_match('/view|edit/', env('HTTP_REFERER'))

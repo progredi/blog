@@ -21,9 +21,11 @@ use Cake\View\View;
  */
 class AppView extends View
 {
-
 	/**
-	 * Initialization hook method
+	 * Initialization hook method.
+	 *
+	 * For e.g. use this method to load a helper for all views:
+	 * `$this->loadHelper('Html');`
 	 *
 	 * @return void
 	 */
@@ -31,11 +33,11 @@ class AppView extends View
 	{
 		parent::initialize();
 
-		$this->loadHelper('Html');
-		$this->loadHelper('Form');
-		$this->loadHelper('Flash');
-
-		//$this->loadHelper('Markdown');
+		//$this->loadHelper('Markdown.Markdown');
+		//$this->loadHelper('Tanuck/Markdown.Markdown');
+		//$this->loadHelper('Html');
+		//$this->loadHelper('Form');
+		//$this->loadHelper('Flash');
 		//$this->loadHelper('Paginator');
 	}
 }

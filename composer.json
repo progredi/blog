@@ -1,6 +1,7 @@
 {
     "name": "progredi/blog",
-    "description": "Blog plugin for CakePHP 3.x",
+    "description": "CakePHP 3 Blog plugin for ProgrediCMS",
+    "homepage": "http://www.progredi.co.uk",
     "license": "MIT",
     "type": "cakephp-plugin",
     "authors": [
@@ -13,7 +14,8 @@
     ],
     "require": {
         "php": ">=5.6",
-        "cakephp/cakephp": "3.*"
+        "cakephp/cakephp": "3.*",
+        "ivanamat/cakephp3-markdown": "^1.0"
     },
     "require-dev": {
         "cakephp/cakephp-codesniffer": "^2.3",

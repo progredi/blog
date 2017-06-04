@@ -2,10 +2,14 @@
 
 namespace Progredi\Blog\Model\Table;
 
-use Cake\ORM\Table;
+use Cake\Cache\Cache;
+use Cake\ORM\Query;
+use Cake\ORM\RulesChecker;
+use Cake\Validation\Validator;
+use Progredi\Blog\Model\Table\AppTable;
 
 /**
- * Blog AppTable
+ * Posts Tags Table
  *
  * PHP5/7
  *
@@ -15,9 +19,9 @@ use Cake\ORM\Table;
  * @author    David Scott <support@progredi.co.uk>
  * @copyright Copyright (c) 2014-2017 Progredi
  * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- * @link      http://www.progredi.co.uk/cakephp/plugins/cakephp-blog-plugin
+ * @link      http://www.progredi.co.uk/cakephp/plugins/blog
  */
-class AppTable extends Table
+class PostsTagsTable extends AppTable
 {
 	/**
 	 * Initialize method
@@ -27,8 +31,8 @@ class AppTable extends Table
 	 */
 	public function initialize(array $config)
 	{
-		// Behaviors
+		parent::initialize($config);
 
-		$this->addBehavior('Timestamp');
+		$this->table('blog_posts_tags');
 	}
 }
