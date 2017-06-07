@@ -14,6 +14,6 @@
 --
 
 INSERT INTO `app_preferences` (`key`, `value`, `title`, `description`, `input_type`, `editable`, `placeholder`, `position`, `enabled`, `created`, `modified`) VALUES
-('Blog.title', 'CakePHP Development Blog', NULL, NULL, 'text', 1, NULL, 1, 1, NOW(), NOW()),
-('Blog.subtitle', 'Articles and tutorials on CakePHP web development', NULL, NULL, 'text', 1, NULL, 2, 1, NOW(), NOW()),
+('Blog.title', 'Blog Title', NULL, NULL, 'text', 1, NULL, 1, 1, NOW(), NOW()),
+('Blog.subtitle', 'Blog subtitle', NULL, NULL, 'text', 1, NULL, 2, 1, NOW(), NOW()),
 ('Blog.pagination', '10', NULL, NULL, 'text', 1, NULL, 3, 1, NOW(), NOW());

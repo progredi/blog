@@ -2,12 +2,11 @@
 
 namespace Progredi\Blog\Controller\Admin;
 
-use Progredi\Blog\Controller\Admin\AppController;
-
 use Cake\Datasource\Exception\InvalidPrimaryKeyException;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Network\Exception\NotFoundException;
 use Cake\Network\Session;
+use Progredi\Blog\Controller\Admin\AppController;
 
 /**
  * Posts Admin Controller
@@ -16,18 +15,19 @@ use Cake\Network\Session;
  *
  * @category  Controller
  * @package   Progredi\Blog
- * @version   0.1.0
  * @author    David Scott <support@progredi.co.uk>
  * @copyright Copyright (c) 2014-2017 Progredi
  * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- * @link      http://www.progredi.co.uk/cakephp/plugins/blog
+ * @link      https://github.com/progredi/blog
  */
 class PostsController extends AppController
 {
 	/**
 	 * Index method [Admin]
 	 *
-	 * @return void
+     * @access public
+     * @throws \Cake\Network\Exception\NotFoundException On paging error
+     * @return \Cake\Http\Response|void Redirects on pagination error, renders view otherwise.
 	 */
 	public function index()
 	{
@@ -54,11 +54,8 @@ class PostsController extends AppController
 
 		try {
 			$posts = $this->paginate($this->Posts);
-		}
-		catch (NotFoundException $e) {
-
+		} catch (NotFoundException $e) {
 			// Check for out of range page request.
-
 			$this->Flash->error(__("Page request out of range"));
 			return $this->redirect(['action' => 'index']);
 		}
@@ -72,7 +69,8 @@ class PostsController extends AppController
 	/**
 	 * Add method [Admin]
 	 *
-	 * @return void Redirects on successful add, renders view otherwise.
+     * @access public
+     * @return \Cake\Http\Response|void Redirects on successful add, renders view otherwise.
 	 */
 	public function add()
 	{
@@ -81,14 +79,14 @@ class PostsController extends AppController
 		$post = $this->Posts->newEntity();
 
 		if ($this->request->is('post')) {
-			$post = $this->Posts->patchEntity($post, $this->request->data);
+			$post = $this->Posts->patchEntity($post, $this->request->getData());
 			// Validate request data for new entity
 			if ($post->errors()) {
 				// Entity failed validation.
 			}
 			if ($this->Posts->save($post)) {
 				$this->Flash->success(__('Post details have been saved'));
-				if (isset($this->request->data['apply'])) {
+				if (!is_null($this->request->getData('apply'))) {
 					return $this->redirect(['action' => 'edit', $this->Posts->id]);
 				}
 				return $this->redirect($session->read('App.referrer'));
@@ -96,7 +94,7 @@ class PostsController extends AppController
 			$this->Flash->error(__('Post details could not be saved, please try again'));
 		}
 
-		if (!$this->request->data) {
+		if (!$this->request->getData()) {
 			$session->write('App.referrer', $this->referer());
 		}
 
@@ -109,7 +107,7 @@ class PostsController extends AppController
 	/**
 	 * View method [Admin]
 	 *
-	 * @param string|null $id post id. Can be null for testing purposes.
+	 * @param string|null $id
 	 * @return void Redirects on failed entity retrieval, renders view otherwise.
 	 */
 	public function view($id = null)
@@ -124,18 +122,12 @@ class PostsController extends AppController
 					'Tags'
 				]
 			]);
-		}
-		catch (RecordNotFoundException $e) {
-
+		} catch (RecordNotFoundException $e) {
 			// Record primary key not found in table.
-
 			$this->Flash->error(__('Post not found'));
 			return $this->redirect(['action' => 'index']);
-		}
-		catch (InvalidPrimaryKeyException $e) {
-
+		} catch (InvalidPrimaryKeyException $e) {
 			// Invalid primary key, e.g. NULL.
-
 			$this->Flash->error(__("Invalid record id specified"));
 			return $this->redirect(['action' => 'index']);
 		}
@@ -152,7 +144,7 @@ class PostsController extends AppController
 	/**
 	 * Edit method [Admin]
 	 *
-	 * @param string|null $id Post id.
+	 * @param string|null $id
 	 * @return void Redirects to referring page on successful edit, renders view otherwise.
 	 * @throws \Cake\Network\Exception\NotFoundException When record not found.
 	 */
@@ -164,18 +156,12 @@ class PostsController extends AppController
 			$post = $this->Posts->get($id, [
 				'contain' => ['Comments']
 			]);
-		}
-		catch (RecordNotFoundException $e) {
-
+		} catch (RecordNotFoundException $e) {
 			// Record primary key not found in table.
-
 			$this->Flash->error(__('Post not found'));
 			return $this->redirect(['action' => 'index']);
-		}
-		catch (InvalidPrimaryKeyException $e) {
-
+		} catch (InvalidPrimaryKeyException $e) {
 			// Invalid primary key, e.g. NULL.
-
 			$this->Flash->error(__("Invalid record id specified"));
 			return $this->redirect(['action' => 'index']);
 		}
@@ -183,14 +169,14 @@ class PostsController extends AppController
 		$session = $this->request->session();
 
 		if ($this->request->is(['patch', 'post', 'put'])) {
-			$post = $this->Posts->patchEntity($post, $this->request->data);
+			$post = $this->Posts->patchEntity($post, $this->request->getData());
 			// Validate request data for new entity
 			if ($post->errors()) {
 				// Entity failed validation.
 			}
 			if ($this->Posts->save($post)) {
 				$this->Flash->success(__('Post details haves been updated'));
-				if (!isset($this->request->data['apply'])) {
+                if (!is_null($this->request->getData('apply'))) {
 					return $this->redirect($session->read('App.referrer'));
 				}
 			} else {
@@ -212,8 +198,11 @@ class PostsController extends AppController
 	/**
 	 * Delete method [Admin]
 	 *
-	 * @param string|null $id post id.
-	 * @return void Redirects to referrer or index method
+     * @access public
+     * @param string|null $id
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @throws \Cake\Datasource\Exception\InvalidPrimaryKeyException When primary key invalid
+     * @return \Cake\Http\Response Redirects to index method or referrer
 	 */
 	public function delete($id = null)
 	{
@@ -223,18 +212,12 @@ class PostsController extends AppController
 
 		try {
 			$post = $this->Posts->get($id);
-		}
-		catch (RecordNotFoundException $e) {
-
+		} catch (RecordNotFoundException $e) {
 			// Record primary key not found in table.
-
 			$this->Flash->error(__('Post not found'));
 			return $this->redirect(env('HTTP_REFERER'));
-		}
-		catch (InvalidPrimaryKeyException $e) {
-
+		} catch (InvalidPrimaryKeyException $e) {
 			// Invalid primary key, e.g. NULL.
-
 			$this->Flash->error(__("Invalid record id specified"));
 			return $this->redirect(env('HTTP_REFERER'));
 		}

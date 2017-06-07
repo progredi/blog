@@ -15,7 +15,6 @@ use Cake\Network\Exception\NotFoundException;
  *
  * @category  Controller
  * @package   Progredi\Blog
- * @version   0.1.0
  * @author    David Scott <support@progredi.co.uk>
  * @copyright Copyright (c) 2014-2017 Progredi
  * @license   http://www.opensource.org/licenses/mit-license.php The MIT License

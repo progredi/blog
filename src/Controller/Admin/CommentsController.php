@@ -1,35 +1,40 @@
 <?php
+
 namespace Progredi\Blog\Controller\Admin;
 
+use Cake\Datasource\Exception\InvalidPrimaryKeyException;
+use Cake\Datasource\Exception\RecordNotFoundException;
+use Cake\Network\Exception\NotFoundException;
+use Cake\Network\Session;
 use Progredi\Blog\Controller\Admin\AppController;
 
 /**
- * Comments Controller
+ * Comments Admin Controller
  *
- * PHP5
+ * PHP5/7
  *
  * @category  Controller\Admin
  * @package   Progredi\Blog
- * @version   0.1.0
  * @author    David Scott <support@progredi.co.uk>
  * @copyright Copyright (c) 2014-2017 Progredi
  * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- * @link      http://www.progredi.co.uk/cakephp/plugins/blog
+ * @link      https://github.com/progredi/blog
  */
 class CommentsController extends AppController
 {
 	/**
 	 * Index method [Admin]
 	 *
-	 * @return void
+     * @access public
+     * @throws \Cake\Network\Exception\NotFoundException On paging error
+     * @return \Cake\Http\Response|void Redirects on pagination error, renders view otherwise.
 	 */
 	public function index()
 	{
 		// Configure pagination request.
 
 		$this->paginate['Comments'] = [
-			'conditions' => parent::admin_index(),
-			//'fields' => ['Comments.id', 'Comments.name', 'Comments.enabled'],
+			'conditions' => parent::index(),
 			'limit' => $this->paginate['limit'],
 			'order' => ['Comments.name' => 'asc'],
 			'contain' => [
@@ -41,11 +46,8 @@ class CommentsController extends AppController
 
 		try {
 			$comments = $this->paginate($this->Comments);
-		}
-		catch (NotFoundException $e) {
-
+		} catch (NotFoundException $e) {
 			// Check for out of range page request.
-
 			$this->Flash->error(__("Page request out of range"));
 			return $this->redirect(['action' => 'index']);
 		}
@@ -59,7 +61,8 @@ class CommentsController extends AppController
 	/**
 	 * Add method [Admin]
 	 *
-	 * @return void Redirects on successful add, renders view otherwise.
+     * @access public
+     * @return \Cake\Http\Response|void Redirects on successful add, renders view otherwise.
 	 */
 	public function add()
 	{
@@ -68,14 +71,14 @@ class CommentsController extends AppController
 		$comment = $this->Comments->newEntity();
 
 		if ($this->request->is('post')) {
-			$comment = $this->Comments->patchEntity($comment, $this->request->data);
+			$comment = $this->Comments->patchEntity($comment, $this->request->getData());
 			// Validate request data for new entity
-			if ($comment->errors()) {
+			if ($comment->getErrors()) {
 				// Entity failed validation.
 			}
 			if ($this->Comments->save($comment)) {
 				$this->Flash->success(__('Comment details have been saved'));
-				if (isset($this->request->data['apply'])) {
+				if (!is_null($this->request->getData('apply'))) {
 					return $this->redirect(['action' => 'edit', $this->Comments->id]);
 				}
 				return $this->redirect($session->read('App.referrer'));
@@ -83,7 +86,7 @@ class CommentsController extends AppController
 			$this->Flash->error(__('Comment details could not be saved, please try again'));
 		}
 
-		if (!$this->request->data) {
+		if (!$this->request->getData()) {
 			$session->write('App.referrer', $this->referer());
 		}
 
@@ -96,8 +99,11 @@ class CommentsController extends AppController
 	/**
 	 * View method [Admin]
 	 *
-	 * @param string|null $id comment id. Can be null for testing purposes.
-	 * @return void Redirects on failed entity retrieval, renders view otherwise.
+     * @access public
+     * @param string|null $id
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @throws \Cake\Datasource\Exception\InvalidPrimaryKeyException When primary key invalid
+     * @return \Cake\Http\Response|void Redirects on failed entity retrieval, renders view otherwise.
 	 */
 	public function view($id = null)
 	{
@@ -108,18 +114,12 @@ class CommentsController extends AppController
 				//'contain' => ['Posts']
 			//]
 			);
-		}
-		catch (RecordNotFoundException $e) {
-
+		} catch (RecordNotFoundException $e) {
 			// Record primary key not found in table.
-
 			$this->Flash->error(__('Comment not found'));
 			return $this->redirect(['action' => 'index']);
-		}
-		catch (InvalidPrimaryKeyException $e) {
-
+		} catch (InvalidPrimaryKeyException $e) {
 			// Invalid primary key, e.g. NULL.
-
 			$this->Flash->error(__("Invalid record id specified"));
 			return $this->redirect(['action' => 'index']);
 		}
@@ -136,9 +136,11 @@ class CommentsController extends AppController
 	/**
 	 * Edit method [Admin]
 	 *
-	 * @param string|null $id Comment id.
-	 * @return void Redirects to referring page on successful edit, renders view otherwise.
-	 * @throws \Cake\Network\Exception\NotFoundException When record not found.
+     * @access public
+     * @param string|null $id
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @throws \Cake\Datasource\Exception\InvalidPrimaryKeyException When primary key invalid
+     * @return \Cake\Http\Response|void Redirects to referring page on successful edit, renders view otherwise.
 	 */
 	public function edit($id = null)
 	{
@@ -148,18 +150,12 @@ class CommentsController extends AppController
 			$comment = $this->Comments->get($id, [
 				'contain' => ['AssocComments']
 			]);
-		}
-		catch (RecordNotFoundException $e) {
-
+		} catch (RecordNotFoundException $e) {
 			// Record primary key not found in table.
-
 			$this->Flash->error(__('Comment not found'));
 			return $this->redirect(['action' => 'index']);
-		}
-		catch (InvalidPrimaryKeyException $e) {
-
+		} catch (InvalidPrimaryKeyException $e) {
 			// Invalid primary key, e.g. NULL.
-
 			$this->Flash->error(__("Invalid record id specified"));
 			return $this->redirect(['action' => 'index']);
 		}
@@ -169,12 +165,12 @@ class CommentsController extends AppController
 		if ($this->request->is(['patch', 'post', 'put'])) {
 			$comment = $this->Comments->patchEntity($comment, $this->request->data);
 			// Validate request data for new entity
-			if ($comment->errors()) {
+			if ($comment->getErrors()) {
 				// Entity failed validation.
 			}
 			if ($this->Comments->save($comment)) {
 				$this->Flash->success(__('Comment details haves been updated'));
-				if (!isset($this->request->data['apply'])) {
+				if (!is_null($this->request->getData('apply'))) {
 					return $this->redirect($session->read('App.referrer'));
 				}
 			} else {
@@ -191,16 +187,16 @@ class CommentsController extends AppController
 
 		$this->set('comment', $comment);
 		$this->set('_serialize', ['comment']);
-
-		// Optional dropdown list data
-		//$this->set('assocTableNameList', $this->TableName->AssocTableName->options());
 	}
 
 	/**
 	 * Delete method [Admin]
 	 *
-	 * @param string|null $id comment id.
-	 * @return void Redirects to referrer or index method
+     * @access public
+     * @param string|null $id
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @throws \Cake\Datasource\Exception\InvalidPrimaryKeyException When primary key invalid
+     * @return \Cake\Http\Response Redirects to index method or referrer
 	 */
 	public function delete($id = null)
 	{
@@ -210,18 +206,12 @@ class CommentsController extends AppController
 
 		try {
 			$comment = $this->Comments->get($id);
-		}
-		catch (RecordNotFoundException $e) {
-
+		} catch (RecordNotFoundException $e) {
 			// Record primary key not found in table.
-
 			$this->Flash->error(__('Comment not found'));
 			return $this->redirect(env('HTTP_REFERER'));
-		}
-		catch (InvalidPrimaryKeyException $e) {
-
+		} catch (InvalidPrimaryKeyException $e) {
 			// Invalid primary key, e.g. NULL.
-
 			$this->Flash->error(__("Invalid record id specified"));
 			return $this->redirect(env('HTTP_REFERER'));
 		}

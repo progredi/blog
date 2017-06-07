@@ -1,20 +1,20 @@
 <?php
+
 namespace Progredi\Blog\Controller\Admin;
 
 use Progredi\Blog\Controller\Admin\AppController;
 
 /**
- * Blog Controller
+ * Blog Admin Controller
  *
- * PHP5
+ * PHP5/7
  *
  * @category  Controller
  * @package   Progredi\Blog
- * @version   0.1.0
  * @author    David Scott <support@progredi.co.uk>
- * @copyright Copyright (c) 2016 Progredi
+ * @copyright Copyright (c) 2014-2017 Progredi
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
- * @link      http://www.progredi.co.uk/cakephp/plugins/cakephp-blog-plugin
+ * @link      https://github.com/progredi/blog
  */
 class BlogController extends AppController
 {

@@ -18,7 +18,7 @@ use Cake\Routing\Route\DashedRoute;
  * @link      https://github.com/progredi/blog
  */
 
-Router::defaultRouteClass(DashedRoute::class);
+//Router::defaultRouteClass(DashedRoute::class);
 
 Router::scope('/', function (RouteBuilder $routes) {
 
@@ -30,6 +30,8 @@ Router::scope('/', function (RouteBuilder $routes) {
 });
 
 Router::plugin('Progredi/Blog', ['path' => '/blog'], function (RouteBuilder $routes) {
+
+    $routes->extensions(['rss']);
 
     $routes->connect(
         '/category/:category',
@@ -78,6 +80,8 @@ Router::plugin('Progredi/Blog', ['path' => '/blog'], function (RouteBuilder $rou
     $routes->connect('/:controller/:action/:id',
         [], ['id' => '[0-9]+', 'pass' => ['id']]
     );
+
+    $routes->fallbacks(DashedRoute::class);
 });
 
 Router::prefix('admin', function (RouteBuilder $routes) {
@@ -91,7 +95,7 @@ Router::prefix('admin', function (RouteBuilder $routes) {
         ['plugin' => null, 'controller' => 'Preferences', 'action' => 'index', 'blog']
     );
 
-    $routes->plugin('Progredi/Blog', ['path' => '/blog'], function ($routes) {
+    $routes->plugin('Progredi/Blog', ['path' => '/blog'], function (RouteBuilder $routes) {
 
         $routes->connect('/dashboard',
             ['controller' => 'Blog', 'action' => 'dashboard']
@@ -107,5 +111,7 @@ Router::prefix('admin', function (RouteBuilder $routes) {
             [],
             ['pass' => ['id'], 'id' => '[0-9]+']
         );
+
+        $routes->fallbacks(DashedRoute::class);
     });
 });

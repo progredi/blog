@@ -4,42 +4,31 @@ namespace Progredi\Blog\Controller\Admin;
 
 use Cake\Datasource\Exception\InvalidPrimaryKeyException;
 use Cake\Datasource\Exception\RecordNotFoundException;
-use Cake\Event\Event;
 use Cake\Network\Exception\NotFoundException;
 use Cake\Network\Session;
-use Cake\ORM\TableRegistry;
 use Progredi\Blog\Controller\Admin\AppController;
 
 /**
- * ControllerName Controller
+ * Categories Admin Controller
  *
- * PHP5
+ * PHP5/7
  *
  * @category  Controller\Admin
  * @package   Progredi\Blog
- * @version   0.1.0
  * @author    David Scott <support@progredi.co.uk>
  * @copyright Copyright (c) 2014-2017 Progredi
  * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- * @link      http://www.progredi.co.uk/cakephp/plugins/blog
+ * @link      https://github.com/progredi/blog
  */
 class CategoriesController extends AppController
 {
 	/**
-	 * BeforeFilter method [Admin]
-	public function beforeFilter(Event $event)
-	{
-		parent::beforeFilter($event);
-
-		$this->Categories->recover();
-	}
-	 */
-
-	/**
 	 * Index method [Admin]
 	 *
-	 * @return void
-	 */
+     * @access public
+     * @throws \Cake\Network\Exception\NotFoundException On paging error
+	 * @return \Cake\Http\Response|void Redirects on pagination error, renders view otherwise.
+     */
 	public function index()
 	{
 		// Configure pagination request.
@@ -56,14 +45,8 @@ class CategoriesController extends AppController
 
 		try {
 			$categories = $this->paginate($this->Categories);
-
-//echo "<pre>\n\nRequest Data: " . print_r($categories->toArray(), true) . "\n</pre>\n\n";
-//exit();
-		}
-		catch (NotFoundException $e) {
-
+		} catch (NotFoundException $e) {
 			// Check for out of range page request.
-
 			$this->Flash->error(__("Page request out of range"));
 			return $this->redirect(['action' => 'index']);
 		}
@@ -77,7 +60,8 @@ class CategoriesController extends AppController
 	/**
 	 * Add method [Admin]
 	 *
-	 * @return void Redirects on successful add, renders view otherwise.
+     * @access public
+	 * @return \Cake\Http\Response|void Redirects on successful add, renders view otherwise.
 	 */
 	public function add()
 	{
@@ -86,14 +70,14 @@ class CategoriesController extends AppController
 		$category = $this->Categories->newEntity();
 
 		if ($this->request->is('post')) {
-			$category = $this->Categories->patchEntity($category, $this->request->data);
+			$category = $this->Categories->patchEntity($category, $this->request->getData());
 			// Validate request data for new entity
-			if ($category->errors()) {
+			if ($category->getErrors()) {
 				// Entity failed validation.
 			}
 			if ($this->Categories->save($category)) {
 				$this->Flash->success(__('Category details have been saved'));
-				if (isset($this->request->data['apply'])) {
+				if (!is_null($this->request->getData('apply'))) {
 					return $this->redirect(['action' => 'edit', $this->Categories->id]);
 				}
 				return $this->redirect($session->read('App.referrer'));
@@ -101,7 +85,7 @@ class CategoriesController extends AppController
 			$this->Flash->error(__('Category details could not be saved, please try again'));
 		}
 
-		if (!$this->request->data) {
+		if (!$this->request->getData()) {
 			$session->write('App.referrer', $this->referer());
 		}
 
@@ -116,8 +100,11 @@ class CategoriesController extends AppController
 	/**
 	 * View method [Admin]
 	 *
-	 * @param string|null $id category id. Can be null for testing purposes.
-	 * @return void Redirects on failed entity retrieval, renders view otherwise.
+     * @access public
+	 * @param string|null $id
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @throws \Cake\Datasource\Exception\InvalidPrimaryKeyException When primary key invalid
+     * @return \Cake\Http\Response|void Redirects on failed entity retrieval, renders view otherwise.
 	 */
 	public function view($id = null)
 	{
@@ -127,18 +114,12 @@ class CategoriesController extends AppController
 			$category = $this->Categories->get($id, [
 				//'contain' => ['Posts']
 			]);
-		}
-		catch (RecordNotFoundException $e) {
-
+		} catch (RecordNotFoundException $e) {
 			// Record primary key not found in table.
-
 			$this->Flash->error(__('Category not found'));
 			return $this->redirect(['action' => 'index']);
-		}
-		catch (InvalidPrimaryKeyException $e) {
-
+		} catch (InvalidPrimaryKeyException $e) {
 			// Invalid primary key, e.g. NULL.
-
 			$this->Flash->error(__("Invalid record id specified"));
 			return $this->redirect(['action' => 'index']);
 		}
@@ -155,9 +136,11 @@ class CategoriesController extends AppController
 	/**
 	 * Edit method [Admin]
 	 *
-	 * @param string|null $id Category id.
-	 * @return void Redirects to referring page on successful edit, renders view otherwise.
-	 * @throws \Cake\Network\Exception\NotFoundException When record not found.
+     * @access public
+	 * @param string|null $id
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @throws \Cake\Datasource\Exception\InvalidPrimaryKeyException When primary key invalid
+     * @return \Cake\Http\Response|void Redirects to referring page on successful edit, renders view otherwise.
 	 */
 	public function edit($id = null)
 	{
@@ -167,18 +150,12 @@ class CategoriesController extends AppController
 			$category = $this->Categories->get($id, [
 				//'contain' => ['Posts']
 			]);
-		}
-		catch (RecordNotFoundException $e) {
-
+		} catch (RecordNotFoundException $e) {
 			// Record primary key not found in table.
-
 			$this->Flash->error(__('Category not found'));
 			return $this->redirect(['action' => 'index']);
-		}
-		catch (InvalidPrimaryKeyException $e) {
-
+		} catch (InvalidPrimaryKeyException $e) {
 			// Invalid primary key, e.g. NULL.
-
 			$this->Flash->error(__("Invalid record id specified"));
 			return $this->redirect(['action' => 'index']);
 		}
@@ -186,14 +163,14 @@ class CategoriesController extends AppController
 		$session = $this->request->session();
 
 		if ($this->request->is(['patch', 'post', 'put'])) {
-			$category = $this->Categories->patchEntity($category, $this->request->data);
+			$category = $this->Categories->patchEntity($category, $this->request->gatData());
 			// Validate request data for new entity
 			if ($category->errors()) {
 				// Entity failed validation.
 			}
 			if ($this->Categories->save($category)) {
 				$this->Flash->success(__('Category details haves been updated'));
-				if (!isset($this->request->data['apply'])) {
+				if (!is_null($this->request->getData('apply'))) {
 					return $this->redirect($session->read('App.referrer'));
 				}
 			} else {
@@ -201,8 +178,8 @@ class CategoriesController extends AppController
 			}
 		}
 
-		if (!$this->request->data) {
-			$this->request->data = $category;
+		if (!$this->request->getData()) {
+			//$this->request->setData($category);
 			$session->write('App.referrer', $this->referer());
 		}
 
@@ -211,15 +188,15 @@ class CategoriesController extends AppController
 		$this->set('category', $category);
 		$this->set('_serialize', ['category']);
 
-
 		$this->set('categoriesOptions', $this->Categories->options());
 	}
 
 	/**
 	 * MoveUp method [Admin]
 	 *
-	 * @param string|null $id category id.
-	 * @return void Redirects to referrer or index method
+     * @access public
+	 * @param string|null $id
+	 * @return \Cake\Http\Response Redirects to index method
 	 */
     public function moveUp($id = null)
     {
@@ -236,8 +213,8 @@ class CategoriesController extends AppController
 	/**
 	 * MoveDown method [Admin]
 	 *
-	 * @param string|null $id category id.
-	 * @return void Redirects to referrer or index method
+	 * @param string|null $id
+	 * @return \Cake\Http\Response Redirects to index method
 	 */
     public function moveDown($id = null)
     {
@@ -254,8 +231,11 @@ class CategoriesController extends AppController
 	/**
 	 * Delete method [Admin]
 	 *
-	 * @param string|null $id category id.
-	 * @return void Redirects to referrer or index method
+     * @access public
+	 * @param string|null $id
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @throws \Cake\Datasource\Exception\InvalidPrimaryKeyException When primary key invalid
+	 * @return \Cake\Http\Response Redirects to index method or referrer
 	 */
 	public function delete($id = null)
 	{
@@ -265,18 +245,12 @@ class CategoriesController extends AppController
 
 		try {
 			$category = $this->Categories->get($id);
-		}
-		catch (RecordNotFoundException $e) {
-
+		} catch (RecordNotFoundException $e) {
 			// Record primary key not found in table.
-
 			$this->Flash->error(__('Category not found'));
 			return $this->redirect(env('HTTP_REFERER'));
-		}
-		catch (InvalidPrimaryKeyException $e) {
-
+		} catch (InvalidPrimaryKeyException $e) {
 			// Invalid primary key, e.g. NULL.
-
 			$this->Flash->error(__("Invalid record id specified"));
 			return $this->redirect(env('HTTP_REFERER'));
 		}

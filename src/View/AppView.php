@@ -33,11 +33,11 @@ class AppView extends View
 	{
 		parent::initialize();
 
-		//$this->loadHelper('Markdown.Markdown');
-		//$this->loadHelper('Tanuck/Markdown.Markdown');
-		//$this->loadHelper('Html');
-		//$this->loadHelper('Form');
-		//$this->loadHelper('Flash');
-		//$this->loadHelper('Paginator');
+		$this->loadHelper('Form');
+		$this->loadHelper('Flash');
+        $this->loadHelper('Html');
+		$this->loadHelper('Paginator');
+        $this->loadHelper('Markdown.Markdown');
+        //$this->loadHelper('Tanuck/Markdown.Markdown');
 	}
 }
