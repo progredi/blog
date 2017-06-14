@@ -5,10 +5,11 @@ namespace Progredi\Blog\Controller;
 use Cake\Datasource\Exception\InvalidPrimaryKeyException;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Network\Exception\NotFoundException;
+//use Cake\Network\Session;
 use Progredi\Blog\Controller\AppController;
 
 /**
- * Posts Controller
+ * Tags Controller
  *
  * PHP5/7
  *
@@ -20,75 +21,61 @@ use Progredi\Blog\Controller\AppController;
  * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  * @link      https://github.com/progredi/blog
  */
-class PostsController extends AppController
+class TagsController extends AppController
 {
     /**
      * Index method
      *
      * @access public
-     * @throws \Cake\Network\Exception\NotFoundException When record not found.
-     * @return void
+     * @throws \Cake\Network\Exception\NotFoundException On paging error
+     * @return \Cake\Http\Response Redirects on pagination error, otherwise renders view
      */
     public function index()
     {
         // Configure pagination request.
 
-        $this->paginate['Posts'] = [
-            //'conditions' => ['Posts.published !=' => null],
-            /*'fields' => [
-                'Posts.id',
-                'Posts.title',
-                'Posts.slug',
-                'Posts.summary',
-                'Posts.body',
-                'Posts.comment_count',
-                'Posts.published',
-                'Posts.enabled'
-            ],*/
+        $this->paginate['Tags'] = [
+            'conditions' => parent::index(),
             'limit' => $this->paginate['limit'],
-            'order' => ['Posts.published' => 'desc'],
-            'contain' => [
-                'Comments'
-            ]
+            'order' => ['Tags.name' => 'asc']
         ];
 
         // Check for invalid pagination requests.
 
         try {
-            $posts = $this->paginate($this->Posts);
+            $tag = $this->paginate($this->Tags);
         } catch (NotFoundException $e) {
             // Check for out of range page request.
             $this->Flash->error(__("Page request out of range"));
             return $this->redirect(['action' => 'index']);
         }
 
-        $this->set('title_for_layout', __('Blog'));
+        $this->set('title_for_layout', __('Tags') . TS . __('Blog') . TS . __('Admin'));
 
-//echo "<pre>\n\nPosts: " . print_r($posts->toArray(), true) . "\n</pre>\n\n";
-//exit();
-
-        $this->set('posts', $posts);
-        $this->set('_serialize', ['posts']);
+        $this->set('tags', $tag);
+        $this->set('_serialize', ['tags']);
     }
 
     /**
      * View method
      *
-     * @param string|null $id Record identifier
-     * @throws \Cake\Network\Exception\NotFoundException When record not found.
-     * @return void
+     * @access public
+     * @param string|null $id
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @throws \Cake\Datasource\Exception\InvalidPrimaryKeyException When primary key invalid
+     * @return \Cake\Http\Response Redirects on failed entity retrieval, otherwise renders view.
      */
     public function view($id = null)
     {
         // Check for entity request errors.
 
         try {
-            $post = $this->Posts->get($id, [
-                'contain' => ['Comments']
+            $tag = $this->Tags->get($id, [
+                'contain' => ['Posts']
             ]);
         } catch (RecordNotFoundException $e) {
             // Record primary key not found in table.
-            $this->Flash->error(__('Post not found'));
+            $this->Flash->error(__('Tag not found'));
             return $this->redirect(['action' => 'index']);
         } catch (InvalidPrimaryKeyException $e) {
             // Invalid primary key, e.g. NULL.
@@ -96,10 +83,12 @@ class PostsController extends AppController
             return $this->redirect(['action' => 'index']);
         }
 
-//echo "<pre>\n\nPost: " . print_r($post->toArray(), true) . "\n</pre>\n\n";
-//exit();
+        $this->set('title_for_layout', __('View Tag') . TS . __('Blog') . TS . __('Admin'));
 
-        $this->set('post', $post);
-        $this->set('_serialize', ['post']);
+        $session = $this->request->session();
+        $session->write('App.referrer', $this->referer());
+
+        $this->set('tag', $tag);
+        $this->set('_serialize', ['tag']);
     }
 }

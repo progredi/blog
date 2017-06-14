@@ -1,25 +1,26 @@
 {
     "name": "progredi/blog",
-    "description": "CakePHP 3 Blog plugin for ProgrediCMS",
+    "description": "Blog plugin for CakePHP 3 to be used with ProgrediCMS",
+    "type": "cakephp-plugin",
+    "version": "dev-master",
     "homepage": "http://www.progredi.co.uk",
     "license": "MIT",
-    "type": "cakephp-plugin",
     "authors": [
         {
             "name": "Progredi",
             "homepage": "http://www.progredi.co.uk",
             "email": "support@progredi.co.uk",
-            "role": "Author"
+            "role": "Developer"
         }
     ],
     "require": {
         "php": ">=5.6",
-        "cakephp/cakephp": "3.*",
-        "ivanamat/cakephp3-markdown": "^1.0"
+        "cakephp/cakephp": "^3.4",
+        "tanuck/cakephp-markdown": "^1.0"
     },
     "require-dev": {
         "cakephp/cakephp-codesniffer": "^2.3",
-        "phpunit/phpunit": "<6.0"
+        "phpunit/phpunit": "^5.7|^6.0"
     },
     "autoload": {
         "psr-4": {
@@ -28,8 +29,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-           "Cake\\Test\\": "./vendor/cakephp/cakephp/tests",
-           "Progredi\\Blog\\Test\\": "tests"
+           "Progredi\\Blog\\Test\\": "tests",
+           "Cake\\Test\\": "./vendor/cakephp/cakephp/tests"
          }
     }
 }

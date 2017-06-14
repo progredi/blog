@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Category Admin Add Template
+ * Tag Admin Add Template
  *
  * PHP5/7
  *
@@ -19,18 +19,18 @@
     'menuItems' => [
         [__('Dashboard'), __('Admin Dashboard'), ['plugin' => null, 'controller' => 'Admin', 'action' => 'dashboard']],
         [__('Blog'), __('Blog Dashboard'), ['controller' => 'Blog', 'action' => 'dashboard']],
-        [__('Categories'), __('Categories Dashboard'), ['action' => 'index']],
+        [__('Tags'), __('Tags Dashboard'), ['action' => 'index']],
         [null, null, []]
     ]
 ]); ?>
 
-<h1><?= __('Add Category'); ?></h1>
+<h1><?= __('Add Tag'); ?></h1>
 
-<div class="category add form">
+<div class="tag add form">
 
-<?= $this->Form->create($category, ['class' => 'ui form']); ?>
+<?= $this->Form->create($tag, ['class' => 'ui form']); ?>
 
-<?= $this->element('Admin/Categories/form'); ?>
+<?= $this->element('Admin/Tags/form'); ?>
 
 <?= $this->element('Admin/Form/Add/buttons'); ?>
 

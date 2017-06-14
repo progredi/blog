@@ -1,3 +1,20 @@
+<?php
+
+/**
+ * Comment Form Element
+ *
+ * PHP5/7
+ *
+ * @category  Template\Element
+ * @package   Progredi\Blog
+ * @since     0.1.0
+ * @author    David Scott <support@progredi.co.uk>
+ * @copyright Copyright (c) 2014-2017 Progredi
+ * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @link      https://github.com/progredi/blog
+ */
+
+?>
 <div class="ui top attached tabular menu">
 <a class="active item" data-tab="post"><?= __('Comment'); ?></a>
 </div>
@@ -12,15 +29,15 @@
 <h2><?= __('Details'); ?></h2>
 
 <?= $this->Form->input('title', [
-	'templateVars' => [
-		'format' => ' fourteen wide field'
-	]
+    'templateVars' => [
+        'format' => ' fourteen wide field'
+    ]
 ]); ?>
 
 <?= $this->Form->input('body', [
-	'templateVars' => [
-		'format' => ' fourteen wide field'
-	]
+    'templateVars' => [
+        'format' => ' fourteen wide field'
+    ]
 ]); ?>
 
 </div>

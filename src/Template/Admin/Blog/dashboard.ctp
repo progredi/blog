@@ -1,26 +1,26 @@
 <?php
 
 /**
- * Dashboard View
+ * Blog Admin Dashboard View
  *
  * PHP5/7
  *
- * @category  View
+ * @category  Template
  * @package   Progredi\Blog
- * @version   0.1.0
+ * @since     0.1.0
  * @author    David Scott <support@progredi.co.uk>
  * @copyright Copyright (c) 2014-2017 Progredi
  * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- * @link      http://www.progredi.co.uk/cakephp/plugins/blog
+ * @link      https://github.com/progredi/blog
  */
 
 ?>
 <?= $this->element('navigation/breadcrumbs', [
-	'menuItems' => [
-		[__('Dashboard'), __('Admin Dashboard'), ['plugin' => null, 'controller' => 'Admin', 'action' => 'dashboard']],
-		[__('Blog'), __('Blog Dashboard'), ['controller' => 'Blog', 'action' => 'dashboard']],
-		[null, null, []]
-	]
+    'menuItems' => [
+        [__('Dashboard'), __('Admin Dashboard'), ['plugin' => null, 'controller' => 'Admin', 'action' => 'dashboard']],
+        [__('Blog'), __('Blog Dashboard'), ['controller' => 'Blog', 'action' => 'dashboard']],
+        [null, null, []]
+    ]
 ]); ?>
 
 <div class="blog dashboard">

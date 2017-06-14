@@ -5,7 +5,7 @@ namespace Progredi\Blog\Model\Entity;
 use Cake\ORM\Entity;
 
 /**
- * Posts Tag Entity
+ * Categories Post Entity
  *
  * PHP5/7
  *
@@ -17,7 +17,7 @@ use Cake\ORM\Entity;
  * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  * @link      https://github.com/progredi/blog
  */
-class PostsTag extends Entity
+class CategoriesPost extends Entity
 {
     /**
      * Accessible properties

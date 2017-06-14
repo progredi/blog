@@ -3,9 +3,9 @@
 namespace Progredi\Blog\Model\Table;
 
 use Cake\Cache\Cache;
-use Cake\ORM\Query;
-use Cake\ORM\RulesChecker;
-use Cake\Validation\Validator;
+//use Cake\ORM\Query;
+//use Cake\ORM\RulesChecker;
+//use Cake\Validation\Validator;
 use Progredi\Blog\Model\Table\AppTable;
 
 /**
@@ -15,38 +15,59 @@ use Progredi\Blog\Model\Table\AppTable;
  *
  * @category  Model\Table
  * @package   Progredi\Blog
- * @version   0.1.0
+ * @since     0.1.0
  * @author    David Scott <support@progredi.co.uk>
  * @copyright Copyright (c) 2014-2017 Progredi
  * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- * @link      http://www.progredi.co.uk/cakephp/plugins/blog
+ * @link      https://github.com/progredi/blog
  */
 class TagsTable extends AppTable
 {
-	/**
-	 * Initialize method
-	 *
-	 * @param array $config Configuration for the Table.
-	 * @return void
-	 */
-	public function initialize(array $config)
-	{
-		parent::initialize($config);
+    /**
+     * Initialize method
+     *
+     * @access public
+     * @param array $config Table configuration data
+     * @return void
+     */
+    public function initialize(array $config)
+    {
+        parent::initialize($config);
 
-		$this->table('blog_tags');
-		
-		// Behaviors
+        $this->setTable('blog_tags');
 
-		$this->addBehavior('CounterCache', [
-			'Tags' => ['post_count']
-		]);
+        // Behaviors
 
-		// Associations
+        $this->addBehavior('CounterCache', [
+            'Tags' => ['post_count']
+        ]);
 
-		$this->belongsToMany('Posts', [
-			'className' => 'Progredi/Blog.Posts',
-			'joinTable' => 'blog_posts_tags',
-			'foreignKey' => 'tag_id'
-		]);
-	}
+        // Associations
+
+        $this->belongsToMany('Posts', [
+            'className' => 'Progredi/Blog.Posts',
+            'joinTable' => 'blog_posts_tags',
+            'foreignKey' => 'tag_id'
+        ]);
+    }
+
+    /**
+     * Select options method
+     *
+     * @access public
+     * @return array Select options list from enabled records
+     */
+    public function options()
+    {
+        $tags = $this;
+        return Cache::remember('blog_tags_options', function () use ($tags) {
+
+            $query = $tags->find('list')
+                ->select(['id', 'name'])
+                ->where(['enabled' => true])
+                ->order(['name ASC']);
+
+            return $query->toArray();
+        });
+    }
 }

@@ -14,6 +14,7 @@ use Cake\Utility\Inflector;
  *
  * @category  Controller
  * @package   Progredi\Blog
+ * @since     0.1.0
  * @author    David Scott <support@progredi.co.uk>
  * @copyright Copyright (c) 2014-2017 Progredi
  * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
@@ -21,49 +22,46 @@ use Cake\Utility\Inflector;
  */
 class AppController extends BaseController
 {
-	/**
-	 * Pagination Configuration
-	 *
-	 * @var array
-	 * @access public
-	 */
-	public $paginate = [
-		'limit' => 10
-	];
+    /**
+     * Pagination Configuration
+     *
+     * @access public
+     * @var array
+     */
+    public $paginate = [
+        'limit' => 10
+    ];
 
-	/**
-	 * Initialize()
-	 *
-	 * @access public
-	 * @return void
-	 */
-	public function initialize()
-	{
-		parent::initialize();
+    /**
+     * Initialize() method [Admin]
+     *
+     * @access public
+     * @return void
+     */
+    public function initialize()
+    {
+        parent::initialize();
 
-		$this->loadComponent('Flash');
-		$this->loadComponent('Paginator');
-		//$this->loadComponent('Markdown.Markdown');
-	}
+        $this->loadComponent('Flash');
+        $this->loadComponent('Paginator');
+    }
 
     /**
      * BeforeFilter method [Admin]
      *
      * @access public
-     * @param Event $event
+     * @param \Cake\Event\Event $event
      * @return void
      */
-	public function beforeFilter(Event $event)
-	{
-		parent::beforeFilter($event);
+    public function beforeFilter(Event $event)
+    {
+        parent::beforeFilter($event);
 
-		if ($this->request->is('ajax')) {
+        if ($this->request->is('ajax')) {
             // Disable browser caching
             $this->response->withDisabledCache();
-		}
-	}
-
-    // SHARED FUNCTIONS
+        }
+    }
 
     /**
      * Index method [Admin]
@@ -71,33 +69,49 @@ class AppController extends BaseController
      * Provides text search functionality.
      *
      * @access public
-     * @return array
+     * @return array Search query conditions
+     * @return array|void Return to referrering action
      */
     public function index()
     {
-        $conditions = [];
         $model = $this->name;
 
-        if ($this->request->is('get')
-            && !is_null($this->request->getQuery('column'))
-            && !is_null($this->request->getQuery('value'))
-        ) {
-            $column = $this->request->getQuery('column');
-            $value = $this->request->getQuery('value');
-            $conditions = $column == 'id'
-                ? ["$model.id" => [$value]]
-                : ["$model.$column LIKE" => "%$value%"];
+        // Check GET request
+        if (!$this->request->is('get')) {
+            $this->Flash->error(__('Invalid request'));
+            return;
         }
 
-        return $conditions;
+        // Check normal pagination
+        if (!$this->request->getQuery('column', 0) && !$this->request->getQuery('value', 0)) {
+            return;
+        }
+
+        // Check filter column supplied
+        if (!$this->request->getQuery('column', 0)) {
+            $this->Flash->error(__('Filter column not specified'));
+            return;
+        }
+
+        // Check filter value supplied
+        if (!$this->request->getQuery('value', 0)) {
+            $this->Flash->error(__('Filter vallue not specified'));
+            return;
+        }
+
+        $column = $this->request->getQuery('column');
+        $value = $this->request->getQuery('value');
+        return $column == 'id'
+            ? ["$model.id" => [$value]]
+            : ["$model.$column LIKE" => "%$value%"];
     }
 
     /**
      * Enable method [Admin]
      *
      * @access public
-     * @param string|null $id
-     * @return \Cake\Http\Response
+     * @param string|null $id Record identifier
+     * @return \Cake\Http\Response Return to referrering action
      */
     public function enable($id = null)
     {
@@ -113,9 +127,9 @@ class AppController extends BaseController
 
         if ($table->save($entity)) {
             $this->Flash->success(__(Inflector::singularize($this->name) . ' has been enabled'));
-            return $this->redirect($this->referer());
+         } else {
+            $this->Flash->error(__(Inflector::singularize($this->name) . ' could not be enabled'));
         }
-        $this->Flash->error(__(Inflector::singularize($this->name) . ' could not be enabled'));
         return $this->redirect($this->referer());
     }
 
@@ -123,8 +137,8 @@ class AppController extends BaseController
      * Disable method [Admin]
      *
      * @access public
-     * @param string|null $id
-     * @return \Cake\Http\Response
+     * @param string|null $id Record identifier
+     * @return \Cake\Http\Response Return to referrering action
      */
     public function disable($id = null)
     {
@@ -140,9 +154,9 @@ class AppController extends BaseController
 
         if ($table->save($entity)) {
             $this->Flash->success(__(Inflector::singularize($this->name) . ' has been disabled'));
-            return $this->redirect($this->referer());
+        } else {
+            $this->Flash->error(__(Inflector::singularize($this->name) . ' could not be disabled'));
         }
-        $this->Flash->error(__(Inflector::singularize($this->name) . ' could not be disabled'));
         return $this->redirect($this->referer());
     }
 }

@@ -9,7 +9,7 @@ use Cake\Network\Exception\NotFoundException;
 use Progredi\Blog\Controller\Admin\AppController;
 
 /**
- * Posts Admin Controller
+ * Tags Admin Controller
  *
  * PHP5/7
  *
@@ -21,50 +21,39 @@ use Progredi\Blog\Controller\Admin\AppController;
  * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  * @link      https://github.com/progredi/blog
  */
-class PostsController extends AppController
+class TagsController extends AppController
 {
     /**
      * Index method [Admin]
      *
      * @access public
      * @throws \Cake\Network\Exception\NotFoundException On paging error
-     * @return \Cake\Http\Response Redirects on pagination error, otherwise renders view.
+     * @return \Cake\Http\Response Redirects on pagination error, otherwise renders view
      */
     public function index()
     {
-        //$posts = $this->Posts->find('all')->contain(['Tags']);
-
         // Configure pagination request.
 
-        $this->paginate['Posts'] = [
+        $this->paginate['Tags'] = [
             'conditions' => parent::index(),
-            //'fields' => ['Posts.title', 'Posts.comment_count', 'Posts.published', 'Posts.enabled'],
             'limit' => $this->paginate['limit'],
-            'order' => ['Posts.published' => 'desc'],
-            'contain' => [
-                'Comments',
-                //'Categories',
-                'Tags'
-            ]
+            'order' => ['Tags.name' => 'asc']
         ];
 
         // Check for invalid pagination requests.
 
         try {
-            $posts = $this->paginate($this->Posts);
+            $tag = $this->paginate($this->Tags);
         } catch (NotFoundException $e) {
             // Check for out of range page request.
             $this->Flash->error(__("Page request out of range"));
             return $this->redirect(['action' => 'index']);
         }
 
-//echo "<pre>\n\nRequest Data: " . print_r($posts->toArray(), true) . "\n</pre>\n\n";
-//exit();
+        $this->set('title_for_layout', __('Tags') . TS . __('Blog') . TS . __('Admin'));
 
-        $this->set('title_for_layout', __('Posts') . TS . __('Blog') . TS . __('Admin'));
-
-        $this->set('posts', $posts);
-        $this->set('_serialize', ['posts']);
+        $this->set('tags', $tag);
+        $this->set('_serialize', ['tags']);
     }
 
     /**
@@ -77,38 +66,40 @@ class PostsController extends AppController
     {
         $session = $this->request->session();
 
-        $post = $this->Posts->newEntity();
+        $tag = $this->Tags->newEntity();
 
         if ($this->request->is('post')) {
-            $post = $this->Posts->patchEntity($post, $this->request->getData());
+            $tag = $this->Tags->patchEntity($tag, $this->request->getData());
             // Validate request data for new entity
-            //if ($post->errors()) {
+            //if ($tag->getErrors()) {
                 // Entity failed validation.
             //}
-            if ($this->Posts->save($post)) {
-                $this->Flash->success(__('Post details have been saved'));
-                if (!is_null($this->request->getData('apply'))) {
-                    return $this->redirect(['action' => 'edit', $this->Posts->id]);
+            if ($this->Tags->save($tag)) {
+                $this->Flash->success(__('Tag details have been saved'));
+                if (!$this->request->getData('apply', 0)) {
+                    return $this->redirect(['action' => 'edit', $this->Tags->id]);
                 }
                 return $this->redirect($session->read('App.referrer'));
             }
-            $this->Flash->error(__('Post details could not be saved, please try again'));
+            $this->Flash->error(__('Tag details could not be saved, please try again'));
         }
 
         if (!$this->request->getData()) {
             $session->write('App.referrer', $this->referer());
         }
 
-        $this->set('title_for_layout', __('Add Post') . TS . __('Blog') . TS . __('Admin'));
+        $this->set('title_for_layout', __('Add Tag') . TS . __('Blog') . TS . __('Admin'));
 
-        $this->set('post', $post);
-        $this->set('_serialize', ['post']);
+        $this->set('tag', $tag);
+        $this->set('_serialize', ['tag']);
     }
 
     /**
      * View method [Admin]
      *
+     * @access public
      * @param string|null $id
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      * @throws \Cake\Datasource\Exception\InvalidPrimaryKeyException When primary key invalid
      * @return \Cake\Http\Response Redirects on failed entity retrieval, otherwise renders view.
      */
@@ -117,16 +108,12 @@ class PostsController extends AppController
         // Check for entity request errors.
 
         try {
-            $post = $this->Posts->get($id, [
-                'contain' => [
-                    'Comments',
-                    'Categories',
-                    'Tags'
-                ]
+            $tag = $this->Tags->get($id, [
+                'contain' => ['Posts']
             ]);
         } catch (RecordNotFoundException $e) {
             // Record primary key not found in table.
-            $this->Flash->error(__('Post not found'));
+            $this->Flash->error(__('Tag not found'));
             return $this->redirect(['action' => 'index']);
         } catch (InvalidPrimaryKeyException $e) {
             // Invalid primary key, e.g. NULL.
@@ -134,18 +121,19 @@ class PostsController extends AppController
             return $this->redirect(['action' => 'index']);
         }
 
-        $this->set('title_for_layout', __('View Post') . TS . __('Blog') . TS . __('Admin'));
+        $this->set('title_for_layout', __('View Tag') . TS . __('Blog') . TS . __('Admin'));
 
         $session = $this->request->session();
         $session->write('App.referrer', $this->referer());
 
-        $this->set('post', $post);
-        $this->set('_serialize', ['post']);
+        $this->set('tag', $tag);
+        $this->set('_serialize', ['tag']);
     }
 
     /**
      * Edit method [Admin]
      *
+     * @access public
      * @param string|null $id
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      * @throws \Cake\Datasource\Exception\InvalidPrimaryKeyException When primary key invalid
@@ -156,16 +144,12 @@ class PostsController extends AppController
         // Check for entity request errors.
 
         try {
-            $post = $this->Posts->get($id, [
-                'contain' => [
-                    'Comments',
-                    'Categories',
-                    'Tags'
-                ]
+            $tag = $this->Tags->get($id, [
+                'contain' => ['Posts']
             ]);
         } catch (RecordNotFoundException $e) {
             // Record primary key not found in table.
-            $this->Flash->error(__('Post not found'));
+            $this->Flash->error(__('Tag not found'));
             return $this->redirect(['action' => 'index']);
         } catch (InvalidPrimaryKeyException $e) {
             // Invalid primary key, e.g. NULL.
@@ -176,29 +160,29 @@ class PostsController extends AppController
         $session = $this->request->session();
 
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $post = $this->Posts->patchEntity($post, $this->request->getData());
+            $tag = $this->Tags->patchEntity($tag, $this->request->getData());
             // Validate request data for new entity
-            //if ($post->errors()) {
+            //if ($tag->errors()) {
             // Entity failed validation.
             //}
-            if ($this->Posts->save($post)) {
-                $this->Flash->success(__('Post details haves been updated'));
+            if ($this->Categories->save($tag)) {
+                $this->Flash->success(__('Tag details haves been updated'));
                 if (!$this->request->getData('apply', 0)) {
                     return $this->redirect($session->read('App.referrer'));
                 }
             } else {
-                $this->Flash->error(__('Post details could not be updated, please try again'));
+                $this->Flash->error(__('Tag details could not be updated, please try again'));
             }
         }
 
         if (!$this->request->getData()) {
-             $session->write('App.referrer', $this->referer());
+            $session->write('App.referrer', $this->referer());
         }
 
-        $this->set('title_for_layout', __('Edit Post') . TS . __('Blog') . TS . __('Admin'));
+        $this->set('title_for_layout', __('Edit Tag') . TS . __('Blog') . TS . __('Admin'));
 
-        $this->set('post', $post);
-        $this->set('_serialize', ['post']);
+        $this->set('tag', $tag);
+        $this->set('_serialize', ['tag']);
     }
 
     /**
@@ -217,10 +201,10 @@ class PostsController extends AppController
         // Check for entity request errors.
 
         try {
-            $post = $this->Posts->get($id);
+            $tag = $this->Tags->get($id);
         } catch (RecordNotFoundException $e) {
             // Record primary key not found in table.
-            $this->Flash->error(__('Post not found'));
+            $this->Flash->error(__('Tag not found'));
             return $this->redirect(env('HTTP_REFERER'));
         } catch (InvalidPrimaryKeyException $e) {
             // Invalid primary key, e.g. NULL.
@@ -228,10 +212,10 @@ class PostsController extends AppController
             return $this->redirect(env('HTTP_REFERER'));
         }
 
-        if ($this->Posts->delete($post)) {
-            $this->Flash->success(__('Post has been deleted'));
+        if ($this->Tags->delete($tag)) {
+            $this->Flash->success(__('Tag has been deleted'));
         } else {
-            $this->Flash->error(__('Post could not be deleted, please try again'));
+            $this->Flash->error(__('Tag could not be deleted, please try again'));
         }
 
         return $this->redirect(preg_match('/view|edit/', env('HTTP_REFERER'))

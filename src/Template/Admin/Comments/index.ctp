@@ -1,26 +1,26 @@
 <?php
 
 /**
- * Post List Template
+ * Comments Admin List Template
  *
  * PHP5/7
  *
  * @category  Template
  * @package   Progredi\Blog
- * @version   0.1.0
+ * @since     0.1.0
  * @author    David Scott <support@progredi.co.uk>
  * @copyright Copyright (c) 2014-2017 Progredi
- * @license   http://www.opensource.org/licenses/mit-license.php MIT License
- * @link      http://www.progredi.co.uk/cakephp/plugins/blog
+ * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @link      https://github.com/progredi/blog
  */
 
 ?>
 <?= $this->element('navigation/breadcrumbs', [
-	'menuItems' => [
-		[__('Dashboard'), __('Admin Dashboard'), ['plugin' => null, 'controller' => 'Admin', 'action' => 'dashboard']],
-		[__('Blog'), __('Blog Dashboard'), ['controller' => 'Blog', 'action' => 'dashboard']],
-		[__('Posts'), __('Posts Dashboard'), ['action' => 'index']]
-	]
+    'menuItems' => [
+        [__('Dashboard'), __('Admin Dashboard'), ['plugin' => null, 'controller' => 'Admin', 'action' => 'dashboard']],
+        [__('Blog'), __('Blog Dashboard'), ['controller' => 'Blog', 'action' => 'dashboard']],
+        [__('Posts'), __('Posts Dashboard'), ['action' => 'index']]
+    ]
 ]); ?>
 
 <h1 class="ui large header"><?= __('Posts'); ?></h1>
@@ -34,16 +34,16 @@
 <div class="sixteen wide column">
 
 <?= $this->Html->link('<i class="plus icon"></i>' . ' ' . __('Post'),
-	['action' => 'add'],
-	['class' => 'ui add button', 'title' => __('Add new post'), 'escape' => false]
+    ['action' => 'add'],
+    ['class' => 'ui add button', 'title' => __('Add new post'), 'escape' => false]
 ); ?>
 
 </div>
 <div class="sixteen wide column">
 
 <?= $this->element('search-filter', [
-	'columns' => ['id', 'title'],
-	'default' => 'name'
+    'columns' => ['id', 'title'],
+    'default' => 'name'
 ]); ?>
 
 </div>
@@ -89,33 +89,33 @@
 <td class="center aligned status"><?=
 
 $post->enabled ?
-	$this->Html->link('<i class="large enabled icon"></i>',
-		['action' => 'disable', $post->id],
-		['title' => __('Post') . ' ' . __('is enabled: click to disable'), 'escape' => false]) :
-	$this->Html->link('<i class="large disabled icon"></i>',
-		['action' => 'enable', $post->id],
-		['title' => __('Post') . ' ' . __('is disabled: click to enable'), 'escape' => false]);
+    $this->Html->link('<i class="large enabled icon"></i>',
+        ['action' => 'disable', $post->id],
+        ['title' => __('Post') . ' ' . __('is enabled: click to disable'), 'escape' => false]) :
+    $this->Html->link('<i class="large disabled icon"></i>',
+        ['action' => 'enable', $post->id],
+        ['title' => __('Post') . ' ' . __('is disabled: click to enable'), 'escape' => false]);
 
 ?></td>
 <td class="three action icons"><?=
 
 $this->Html->link('<i class="large view record icon"></i>',
-	['action' => 'view', $post->id],
-	['title' => __('View post'), 'escape' => false]
+    ['action' => 'view', $post->id],
+    ['title' => __('View post'), 'escape' => false]
 );
 
 ?> <?=
 
 $this->Html->link('<i class="large edit record icon"></i>',
-	['action' => 'edit', $post->id],
-	['title' => __('Edit post'), 'escape' => false]
+    ['action' => 'edit', $post->id],
+    ['title' => __('Edit post'), 'escape' => false]
 );
 
 ?> <?=
 
 $this->Form->postLink('<i class="large delete record icon"></i>',
-	['action' => 'delete', $post->id],
-	['title' => __('Delete post'), 'confirm' => __('Are you sure?'), 'escape' => false]
+    ['action' => 'delete', $post->id],
+    ['title' => __('Delete post'), 'confirm' => __('Are you sure?'), 'escape' => false]
 );
 
 ?></td>
@@ -148,16 +148,16 @@ $this->Form->postLink('<i class="large delete record icon"></i>',
 <div class="sixteen wide column">
 
 <?= $this->Html->link('<i class="plus icon"></i>' . ' ' . __('Post'),
-	['action' => 'add'],
-	['class' => 'ui add button', 'title' => __('Add new post'), 'escape' => false]
+    ['action' => 'add'],
+    ['class' => 'ui add button', 'title' => __('Add new post'), 'escape' => false]
 ); ?>
 
 </div>
 <div class="sixteen wide column">
 
 <?= $this->element('search-filter', [
-	'columns' => ['id', 'title'],
-	'default' => 'name'
+    'columns' => ['id', 'title'],
+    'default' => 'name'
 ]); ?>
 
 </div>

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Category Form Element
+ * Tag Form Element
  *
  * PHP5/7
  *
@@ -16,12 +16,12 @@
 
 ?>
 <div class="ui top attached tabular menu">
-<a class="active item" data-tab="category"><?= __('Category'); ?></a>
+<a class="active item" data-tab="tag"><?= __('Tag'); ?></a>
 </div>
 
 <!--[ CATEGORY ]-->
 
-<div class="ui bottom attached active tab segment" data-tab="category">
+<div class="ui bottom attached active tab segment" data-tab="tag">
 
 <div class="ui three column stackable grid">
 <div class="eight wide column">

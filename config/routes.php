@@ -11,14 +11,12 @@ use Cake\Routing\Route\DashedRoute;
  *
  * @category  Config
  * @package   Progredi\Blog
- * @version   0.1.0
+ * @since     0.1.0
  * @author    David Scott <support@progredi.co.uk>
  * @copyright Copyright (c) 2014-2017 Progredi
  * @license   https://choosealicense.com/licenses/mit/ MIT License
  * @link      https://github.com/progredi/blog
  */
-
-//Router::defaultRouteClass(DashedRoute::class);
 
 Router::scope('/', function (RouteBuilder $routes) {
 
@@ -27,6 +25,8 @@ Router::scope('/', function (RouteBuilder $routes) {
     $routes->connect('/blog',
         ['plugin' => 'Progredi/Blog', 'controller' => 'Posts', 'action' => 'index']
     );
+
+    $routes->fallbacks(DashedRoute::class);
 });
 
 Router::plugin('Progredi/Blog', ['path' => '/blog'], function (RouteBuilder $routes) {

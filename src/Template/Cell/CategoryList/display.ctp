@@ -7,11 +7,11 @@
  *
  * @category  Template\Cell
  * @package   Progredi\Blog
- * @version   0.1.0
+ * @since     0.1.0
  * @author    David Scott <support@progredi.co.uk>
  * @copyright Copyright (c) 2014-2017 Progredi
- * @license   http://www.opensource.org/licenses/mit-license.php MIT License
- * @link      http://www.progredi.co.uk/cakephp/plugins/blog
+ * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @link      https://github.com/progredi/blog
  */
 ?>
 <h3 class="ui medium title header"><?= __('Categories'); ?></h3>

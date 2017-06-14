@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Categories Admin List Template
+ * Tags Admin List Template
  *
  * PHP5/7
  *
@@ -19,19 +19,19 @@
     'menuItems' => [
         [__('Dashboard'), __('Admin Dashboard'), ['plugin' => null, 'controller' => 'Admin', 'action' => 'dashboard']],
         [__('Blog'), __('Blog Dashboard'), ['controller' => 'Blog', 'action' => 'dashboard']],
-        [__('Categories'), __('Categories Dashboard'), ['action' => 'index']]
+        [__('Tags'), __('Tags Dashboard'), ['action' => 'index']]
     ]
 ]); ?>
 
-<h1 class="ui large header"><?= __('Categories'); ?></h1>
+<h1 class="ui large header"><?= __('Tags'); ?></h1>
 
 <div class="ui stackable grid">
 <div class="mobile only four wide column">
 
 <?= $this->element('ui/admin/dashboard/actions', [
-    'entity' => 'Category',
-    'columns' => ['id', 'title'],
-    'defaultColumn' => 'title'
+    'entity' => 'Tag',
+    'columns' => ['id', 'name'],
+    'defaultColumn' => 'name'
 ]); ?>
 
 </div>
@@ -57,46 +57,46 @@
 
 <tbody>
 
-<?php if (!$categories) : ?>
+<?php if (!$tags) : ?>
 <tr>
 <td colspan="5"><?= __('No records found'); ?></td>
 </tr>
 
 <?php else: ?>
-<?php foreach ($categories as $category): ?>
+<?php foreach ($tags as $tag): ?>
 <tr>
-<td><?= !is_null($category->parent_id) ? "&nbsp;&nbsp;&ndash;&nbsp;" : ""; ?><?= h($category->name); ?></td>
-<td><?= $category->post_count; ?></td>
+<td><?= h($tag->name); ?></td>
+<td><?= $tag->post_count; ?></td>
 <td class="center aligned status"><?=
 
-$category->enabled ?
+$tag->enabled ?
     $this->Html->link('<i class="large enabled icon"></i>',
-        ['action' => 'disable', $category->id],
-        ['title' => __('Category') . ' ' . __('is enabled: click to disable'), 'escape' => false]) :
+        ['action' => 'disable', $tag->id],
+        ['title' => __('Tag') . ' ' . __('is enabled: click to disable'), 'escape' => false]) :
     $this->Html->link('<i class="large disabled icon"></i>',
-        ['action' => 'enable', $category->id],
-        ['title' => __('Category') . ' ' . __('is disabled: click to enable'), 'escape' => false]);
+        ['action' => 'enable', $tag->id],
+        ['title' => __('Tag') . ' ' . __('is disabled: click to enable'), 'escape' => false]);
 
 ?></td>
 <td class="three action icons"><?=
 
 $this->Html->link('<i class="large view record icon"></i>',
-    ['action' => 'view', $category->id],
-    ['title' => __('View category'), 'escape' => false]
+    ['action' => 'view', $tag->id],
+    ['title' => __('View tag'), 'escape' => false]
 );
 
 ?> <?=
 
 $this->Html->link('<i class="large edit record icon"></i>',
-    ['action' => 'edit', $category->id],
-    ['title' => __('Edit category'), 'escape' => false]
+    ['action' => 'edit', $tag->id],
+    ['title' => __('Edit tag'), 'escape' => false]
 );
 
 ?> <?=
 
 $this->Form->postLink('<i class="large delete record icon"></i>',
-    ['action' => 'delete', $category->id],
-    ['title' => __('Delete category'), 'confirm' => __('Are you sure?'), 'escape' => false]
+    ['action' => 'delete', $tag->id],
+    ['title' => __('Delete tag'), 'confirm' => __('Are you sure?'), 'escape' => false]
 );
 
 ?></td>
@@ -122,9 +122,9 @@ $this->Form->postLink('<i class="large delete record icon"></i>',
 <div class="small monitor only large monitor only four wide column">
 
 <?= $this->element('ui/admin/dashboard/actions', [
-    'entity' => 'Category',
-    'columns' => ['id', 'title'],
-    'defaultColumn' => 'title'
+    'entity' => 'Tag',
+    'columns' => ['id', 'name'],
+    'defaultColumn' => 'name'
 ]); ?>
 
 </div>

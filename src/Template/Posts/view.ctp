@@ -27,8 +27,7 @@
 </div>
 <div class="four wide column">
 
-<h3 class="ui medium title header"><?= __('Categories'); ?></h3>
-
+<?= $this->cell('Progredi/Blog.CategoryList'); ?>
 
 </div>
 </div>

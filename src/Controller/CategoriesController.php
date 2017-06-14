@@ -25,12 +25,30 @@ class CategoriesController extends AppController
     /**
      * View method
      *
-     * @param string|null $id User id.
-     * @return void
-     * @throws \Cake\Network\Exception\NotFoundException When record not found.
+     * @access public
+     * @param string|null $id Record id
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @throws \Cake\Datasource\Exception\InvalidPrimaryKeyException When primary key invalid
+     * @return \Cake\Http\Response|void Redirects on failed entity retrieval, otherwise renders view.
      */
     public function view($id = null)
     {
+        // Check for entity request errors.
+
+        try {
+            $category = $this->Categories->get($id, [
+                'contain' => ['Posts']
+            ]);
+        } catch (RecordNotFoundException $e) {
+            // Record primary key not found in table.
+            $this->Flash->error(__('Category not found'));
+            return $this->redirect(['action' => 'index']);
+        } catch (InvalidPrimaryKeyException $e) {
+            // Invalid primary key, e.g. NULL.
+            $this->Flash->error(__("Invalid record id specified"));
+            return $this->redirect(['action' => 'index']);
+        }
+
         $category = $this->Categories->get($id)
             ->contain([
                 'Posts'

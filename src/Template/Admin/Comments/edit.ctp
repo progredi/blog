@@ -1,27 +1,27 @@
 <?php
 
 /**
- * Comment Edit Template
+ * Comment Admin Edit Template
  *
  * PHP5/7
  *
  * @category  Template
  * @package   Progredi\Blog
- * @version   0.1.0
+ * @since     0.1.0
  * @author    David Scott <support@progredi.co.uk>
  * @copyright Copyright (c) 2014-2017 Progredi
- * @license   http://www.opensource.org/licenses/mit-license.php MIT License
- * @link      http://www.progredi.co.uk/cakephp/plugins/blog
+ * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @link      https://github.com/progredi/blog
  */
 
 ?>
 <?= $this->element('navigation/breadcrumbs', [
-	'menuItems' => [
-		[__('Dashboard'), __('Admin Dashboard'), ['plugin' => null, 'controller' => 'Admin', 'action' => 'dashboard']],
-		[__('Blog'), __('Blog Dashboard'), ['controller' => 'Blog', 'action' => 'dashboard']],
-		[__('Comments'), __('Comments Dashboard'), ['action' => 'index']],
-		[null, null, []]
-	]
+    'menuItems' => [
+        [__('Dashboard'), __('Admin Dashboard'), ['plugin' => null, 'controller' => 'Admin', 'action' => 'dashboard']],
+        [__('Blog'), __('Blog Dashboard'), ['controller' => 'Blog', 'action' => 'dashboard']],
+        [__('Comments'), __('Comments Dashboard'), ['action' => 'index']],
+        [null, null, []]
+    ]
 ]); ?>
 
 <h1><?= __('Edit Comment'); ?>: <strong><?= h($comment->title); ?></strong></h1>

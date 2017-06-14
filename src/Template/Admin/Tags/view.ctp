@@ -19,23 +19,23 @@
     'menuItems' => [
         [__('Dashboard'), __('Admin Dashboard'), ['plugin' => null, 'controller' => 'Admin', 'action' => 'dashboard']],
         [__('Blog'), __('Blog Dashboard'), ['controller' => 'Blog', 'action' => 'dashboard']],
-        [__('Categories'), __('Categories Dashboard'), ['action' => 'index']],
+        [__('Tags'), __('Tags Dashboard'), ['action' => 'index']],
         [null, null, []]
     ]
 ]); ?>
 
-<h1><?= __('View Category'); ?>: <strong><?= h($category->name); ?></strong></h1>
+<h1><?= __('View Tag'); ?>: <strong><?= h($tag->name); ?></strong></h1>
 
-<div class="category view">
+<div class="tag view">
 
 <div class="ui top attached tabular menu">
-<a class="active item" data-tab="category"><?= __('Category'); ?></a>
+<a class="active item" data-tab="tag"><?= __('Tag'); ?></a>
 <a class="item" data-tab="posts"><?= __('Posts'); ?></a>
 </div>
 
-<!--[ POST ]-->
+<!--[ TAG ]-->
 
-<div class="ui bottom attached active tab segment" data-tab="category">
+<div class="ui bottom attached active tab segment" data-tab="tag">
 
 <div class="ui three column stackable grid">
 <div class="six wide column">
@@ -43,11 +43,7 @@
 <h2><?= __('Details'); ?></h2>
 
 <p class="view"><span class="label"><?= __('Name'); ?>: </span><span class="value"><?=
-    h($category->name);
-?></span></p>
-
-<p class="view"><span class="label"><?= __('Parent'); ?>: </span><span class="value"><?=
-    h($category->parent_id);
+    h($tag->name);
 ?></span></p>
 
 </div>
@@ -56,15 +52,15 @@
 <h2><?= __('Meta'); ?></h2>
 
 <p class="view"><span class="label"><?= __('Title'); ?>: </span><span class="value"><?=
-    h($category->meta_title);
+    h($tag->meta_title);
 ?></span></p>
 
 <p class="view"><span class="label"><?= __('Description'); ?>: </span><span class="value"><?=
-    h($category->meta_description);
+    h($tag->meta_description);
 ?></span></p>
 
 <p class="view"><span class="label"><?= __('Keywords'); ?>: </span><span class="value"><?=
-    h($category->meta_keywords);
+    h($tag->meta_keywords);
 ?></span></p>
 
 </div>
@@ -73,11 +69,11 @@
 <h2><?= __('RSS Channel'); ?></h2>
 
 <p class="view"><span class="label"><?= __('Title'); ?>: </span><span class="value"><?=
-    h($category->rss_channel_title);
+    h($tag->rss_channel_title);
 ?></span></p>
 
 <p class="view"><span class="label"><?= __('Description'); ?>: </span><span class="value"><?=
-    h($category->rss_channel_description);
+    h($tag->rss_channel_description);
 ?></span></p>
 
 </div>
@@ -85,7 +81,7 @@
 
 </div>
 
-<!--[ COMMENTS ]-->
+<!--[ POSTS ]-->
 
 <div class="ui bottom attached tab segment" data-tab="posts">
 
@@ -107,13 +103,13 @@
 
 <tbody>
 
-<?php if (empty($posts)) : ?>
+<?php if (empty($category->posts)) : ?>
 <tr>
 <td colspan="4"><?= __('No records found'); ?></td>
 </tr>
 
 <?php else: ?>
-<?php foreach ($posts as $post): ?>
+<?php foreach ($category->posts as $post): ?>
 <tr>
 <td><?= h($post->title); ?></td>
 <td><?= h($post->author); ?></td>

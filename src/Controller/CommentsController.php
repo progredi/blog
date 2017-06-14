@@ -18,69 +18,68 @@ use Progredi\Blog\Controller\AppController;
  */
 class CommentsController extends AppController
 {
-	/**
-	 * index()
-	 */
-	public function index() {
+    /**
+     * index()
+     */
+    public function index() {
 
-		//$this->Blog->find('all');
+        //$this->Blog->find('all');
 
-		$this->set('title_for_layout', __('ControllerName'));
+        $this->set('title_for_layout', __('ControllerName'));
 
-		$this->set('results', $this->paginate());
-	}
-	
-	/**
-	 * view()
-	 */
-	public function view($slug) {
+        $this->set('results', $this->paginate());
+    }
 
-		if (!$this->Blog->findBySlug($slug)) {
+    /**
+     * view()
+     */
+    public function view($slug) {
 
-			$this->Session->setFlash(__('ModelName does not exist'), 'flash/error');
-			$this->redirect(array('action' => 'index'));
-		}
-	}
-	
-	/**
-	 * admin_index()
-	 */
-	public function admin_index() {
+        if (!$this->Blog->findBySlug($slug)) {
+            $this->Session->setFlash(__('ModelName does not exist'), 'flash/error');
+            $this->redirect(array('action' => 'index'));
+        }
+    }
+
+    /**
+     * admin_index()
+     */
+    public function admin_index() {
 
         $this->set('results', $this->Blog->find('all'));
-	}
-	
-	/**
-	 * admin_add()
-	 */
-	public function admin_add() {
+    }
 
-		if (!empty($this->request->data)) {
+    /**
+     * admin_add()
+     */
+    public function admin_add() {
 
-			$this->Blog->create();
+        if (!empty($this->request->data)) {
 
-			if ($this->Blog->save($this->request->data)) {
+            $this->Blog->create();
 
-				$this->Session->setFlash(__('ModelName has been saved'), 'flash/success');
-				if (isset($this->request->data['apply'])) {
+            if ($this->Blog->save($this->request->data)) {
 
-					$this->redirect(array('action'=>'edit', $this->Blog->id));
-				}
-				$this->redirect(array('action'=>'index'));
-			}
-			else {
+                $this->Session->setFlash(__('ModelName has been saved'), 'flash/success');
+                if (isset($this->request->data['apply'])) {
 
-				$this->Session->setFlash(__('ModelName could not be saved, please try again'), 'flash/error');
-			}
-		}
+                    $this->redirect(array('action'=>'edit', $this->Blog->id));
+                }
+                $this->redirect(array('action'=>'index'));
+            }
+            else {
 
-		$this->set('title_for_layout', 'ModelNamePlural :: Add ModelName');
-	}
-	
+                $this->Session->setFlash(__('ModelName could not be saved, please try again'), 'flash/error');
+            }
+        }
+
+        $this->set('title_for_layout', 'ModelNamePlural :: Add ModelName');
+    }
+
     /**
      * admin_view()
      */
-	public function admin_view($id = null) {
+    public function admin_view($id = null) {
 
         if (!$id) {
 
@@ -89,7 +88,7 @@ class CommentsController extends AppController
         }
 
         $this->Blog->id = $id;
-       	$data = $this->Blog->read();
+        $data = $this->Blog->read();
 
         if (empty($data)) {
 
@@ -99,8 +98,8 @@ class CommentsController extends AppController
 
         $this->set('title_for_layout', 'ModelNamePlural :: View ModelName');
         $this->set('data', $data);
-	}
-	
+    }
+
     /**
      * admin_copy()
      */
@@ -113,7 +112,7 @@ class CommentsController extends AppController
         }
 
         $this->Blog->id = $id;
-       	$data = $this->Blog->read();
+        $data = $this->Blog->read();
 
         if (empty($data)) {
 
@@ -134,8 +133,8 @@ class CommentsController extends AppController
     /**
      * admin_edit()
      */
-	public function admin_edit($id = null) {
-	    
+    public function admin_edit($id = null) {
+
         if (!$id) {
 
             $this->Session->setFlash(__('No ModelName Id was specified'), 'flash/error');
@@ -145,7 +144,7 @@ class CommentsController extends AppController
         if (empty($this->request->data)) {
 
             $this->Blog->id = $id;
-       	    $this->request->data = $this->Blog->read();
+            $this->request->data = $this->Blog->read();
 
             if (empty($this->request->data)) {
 
@@ -169,8 +168,8 @@ class CommentsController extends AppController
         }
        
         $this->set('title_for_layout', 'ModelNamePlural :: Edit ModelName');
-	}
-	
+    }
+
     /**
      * admin_enable()
      */
@@ -238,37 +237,37 @@ class CommentsController extends AppController
     /**
      * admin_delete()
      */
-	public function admin_delete($id = null) {
+    public function admin_delete($id = null) {
 
-		if ($this->request->is('get')) {
+        if ($this->request->is('get')) {
 
-			throw new MethodNotAllowedException();
-		}
+            throw new MethodNotAllowedException();
+        }
 
-		if (!$id) {
+        if (!$id) {
 
-			$this->Session->setFlash(__('No ModelName Id was specified'), 'flash/error');
-			$this->redirect(array('action' => 'index'));
-		}
+            $this->Session->setFlash(__('No ModelName Id was specified'), 'flash/error');
+            $this->redirect(array('action' => 'index'));
+        }
 
-		$this->Blog->id = $id;
-		$data = $this->Blog->read();
+        $this->Blog->id = $id;
+        $data = $this->Blog->read();
         
-		if (empty($data)) {
+        if (empty($data)) {
 
-			$this->Session->setFlash(__('ModelName does not exist'), 'flash/error');
-			$this->redirect(array('action' => 'index'));
-		}
+            $this->Session->setFlash(__('ModelName does not exist'), 'flash/error');
+            $this->redirect(array('action' => 'index'));
+        }
 
-		if ($this->Blog->delete($id)) {
+        if ($this->Blog->delete($id)) {
 
-			$this->Session->setFlash(__('ModelName has been deleted'), 'flash/success');
-		}
-		else {
+            $this->Session->setFlash(__('ModelName has been deleted'), 'flash/success');
+        }
+        else {
 
-			$this->Session->setFlash(__('ModelName could not be deleted'), 'flash/error');
-		}
+            $this->Session->setFlash(__('ModelName could not be deleted'), 'flash/error');
+        }
 
-		$this->redirect(array('action' => 'index'));
-	}
+        $this->redirect(array('action' => 'index'));
+    }
 }

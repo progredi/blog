@@ -1,43 +1,41 @@
 <?php
+
 namespace App\View;
 
 use Cake\View\View;
 
 /**
- * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
- * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * Blog App View Class
  *
- * Licensed under The MIT License
- * Redistributions of files must retain the above copyright notice.
+ * PHP5/7
  *
- * @copyright Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
- * @link      http://cakephp.org CakePHP(tm) Project
- * @since     3.0.0
- * @license   http://www.opensource.org/licenses/mit-license.php MIT License
- */
-
-/**
- * App View class
+ * @category  View
+ * @package   Progredi/Blog
+ * @since     0.1.0
+ * @author    David Scott <support@progredi.co.uk>
+ * @copyright Copyright (c) 2014-2017 Progredi
+ * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @link      https://github.com/progredi/blog
  */
 class AppView extends View
 {
-	/**
-	 * Initialization hook method.
-	 *
-	 * For e.g. use this method to load a helper for all views:
-	 * `$this->loadHelper('Html');`
-	 *
-	 * @return void
-	 */
-	public function initialize()
-	{
-		parent::initialize();
+    /**
+     * Initialization hook method.
+     *
+     * For e.g. use this method to load a helper for all views:
+     * `$this->loadHelper('Html');`
+     *
+     * @access public
+     * @return void
+     */
+    public function initialize()
+    {
+        parent::initialize();
 
-		$this->loadHelper('Form');
-		$this->loadHelper('Flash');
+        $this->loadHelper('Form');
+        $this->loadHelper('Flash');
         $this->loadHelper('Html');
-		$this->loadHelper('Paginator');
-        $this->loadHelper('Markdown.Markdown');
-        //$this->loadHelper('Tanuck/Markdown.Markdown');
-	}
+        $this->loadHelper('Paginator');
+        $this->loadHelper('Tanuck/Markdown.Markdown');
+    }
 }

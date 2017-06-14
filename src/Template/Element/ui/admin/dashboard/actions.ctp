@@ -3,17 +3,17 @@
 use Cake\Utility\Inflector;
 
 /**
- * Search Filter Template Element
+ * Search Filter Element Template
  *
  * PHP5
  *
  * @category  Template\Element
- * @package   Framework Plugin
- * @version   3.x
- * @author    David Scott <dscott@progredi.co.uk>
- * @copyright Copyright (c) 2015, Progredi eBusiness
+ * @package   Progredi\Blog
+ * @version   0.1.0
+ * @author    David Scott <support@progredi.co.uk>
+ * @copyright Copyright (c) 2014-2017 Progredi
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
- * @link      http://www.progredi.co.uk/cakephp/plugins/cakephp-application-plugin
+ * @link      http://www.progredi.co.uk/cakephp/plugins/blog
  *
  * Example Output
  * --------------

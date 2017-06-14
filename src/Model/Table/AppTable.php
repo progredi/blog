@@ -11,24 +11,25 @@ use Cake\ORM\Table;
  *
  * @category  Model\Table
  * @package   Progredi\Blog
- * @version   0.1.0
+ * @since     0.1.0
  * @author    David Scott <support@progredi.co.uk>
  * @copyright Copyright (c) 2014-2017 Progredi
  * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- * @link      http://www.progredi.co.uk/cakephp/plugins/cakephp-blog-plugin
+ * @link      https://github.com/progredi/blog
  */
 class AppTable extends Table
 {
-	/**
-	 * Initialize method
-	 *
-	 * @param array $config Configuration for the Table.
-	 * @return void
-	 */
-	public function initialize(array $config)
-	{
-		// Behaviors
+    /**
+     * Initialize method
+     *
+     * @access public
+     * @param array $config Table configuration data
+     * @return void
+     */
+    public function initialize(array $config)
+    {
+        // Behaviors
 
-		$this->addBehavior('Timestamp');
-	}
+        $this->addBehavior('Timestamp');
+    }
 }
